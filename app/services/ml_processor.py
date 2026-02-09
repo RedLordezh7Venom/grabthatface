@@ -3,6 +3,7 @@ import numpy as np
 import mlflow
 import faiss
 import os
+import threading
 from typing import List, Tuple, Optional
 from app.core.config import settings
 from loguru import logger
@@ -17,6 +18,7 @@ class VisionRAGProcessor:
         # HNSW is many times faster than exhaustive search for large datasets
         self.index = faiss.IndexHNSWFlat(self.dimension, 32) # 32 is the number of neighbors
         self.metadata_map = {} # Maps index ID to internal database ID
+        self._lock = threading.Lock() # For thread-safety within a process
         
         mlflow.set_experiment("grabthatface-vision-rag")
         logger.info("VisionRAGProcessor initialized with FAISS HNSW index")
@@ -35,13 +37,14 @@ class VisionRAGProcessor:
 
     def add_to_index(self, face_id: int, encoding: np.ndarray):
         """Add a single vector to the FAISS index."""
-        # FAISS requires float32
-        vector = encoding.reshape(1, -1).astype('float32')
-        # We use a simple sequential ID in FAISS and map it to our DB ID
-        current_id = self.index.ntotal
-        self.index.add(vector)
-        self.metadata_map[current_id] = face_id
-        logger.debug(f"VisionRAG: Added face_id {face_id} to FAISS index. Total: {self.index.ntotal}")
+        with self._lock:
+            # FAISS requires float32
+            vector = encoding.reshape(1, -1).astype('float32')
+            # We use a simple sequential ID in FAISS and map it to our DB ID
+            current_id = self.index.ntotal
+            self.index.add(vector)
+            self.metadata_map[current_id] = face_id
+            logger.debug(f"VisionRAG: Added face_id {face_id} to FAISS index. Total: {self.index.ntotal}")
 
     def query(self, query_encoding: np.ndarray, k: int = 20) -> List[int]:
         """

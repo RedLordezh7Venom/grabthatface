@@ -6,30 +6,15 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Backgro
 from sqlmodel import Session, select
 from .database import get_session
 from .models import Photo, FaceEncoding
-from .processor import FaceRecognizer
-import face_recognition
-import numpy as np
-import json
+from .services.ml_processor import processor
+from .workers.tasks import process_photo_and_extract_faces
 
 router = APIRouter()
-face_recognizer = FaceRecognizer()
 
 UPLOAD_DIR = "data/uploads"
 FACES_DIR = "data/faces"
 
-def process_photo(photo_id: int, file_path: str, session: Session):
-    # This should be a background task
-    image = face_recognizer.load_image_file(file_path)
-    faces = face_recognizer.get_face_encodings(image)
-    
-    for encoding, location in faces:
-        face_encoding = FaceEncoding(
-            photo_id=photo_id,
-            encoding_json=face_recognizer.serialize_encoding(encoding),
-            bounding_box_json=json.dumps(location)
-        )
-        session.add(face_encoding)
-    session.commit()
+# process_photo logic moved to workers/tasks.py
 
 @router.post("/upload", response_model=Photo)
 async def upload_photo(
@@ -51,26 +36,12 @@ async def upload_photo(
     session.commit()
     session.refresh(photo)
     
-    # Trigger REAL background processing
-    background_tasks.add_task(process_photo_bg, photo.id, file_path)
+    # Offload heavy ML to distributed worker
+    process_photo_and_extract_faces.delay(photo.id, file_path)
 
     return photo
 
-def process_photo_bg(photo_id: int, file_path: str):
-    # New session for background task
-    from .database import engine
-    with Session(engine) as session:
-        image = face_recognizer.load_image_file(file_path)
-        faces = face_recognizer.get_face_encodings(image)
-        
-        for encoding, location in faces:
-            face_encoding = FaceEncoding(
-                photo_id=photo_id,
-                encoding_json=face_recognizer.serialize_encoding(encoding),
-                bounding_box_json=json.dumps(location)
-            )
-            session.add(face_encoding)
-        session.commit()
+# process_photo_bg logic moved to workers/tasks.py
 
 @router.post("/search")
 async def search_faces(
@@ -85,41 +56,34 @@ async def search_faces(
         shutil.copyfileobj(file.file, buffer)
         
     try:
-        # Detect face in selfie
-        image = face_recognizer.load_image_file(temp_path)
-        # Assume only one face in selfie for now, take the first one
-        faces = face_recognizer.get_face_encodings(image)
+        # 1. Feature Extraction for Search
+        # We still do extraction synchronously here as it's a search request
+        # but the actual search is O(log N) now.
+        faces = processor.extract_features(temp_path)
         
         if not faces:
             raise HTTPException(status_code=400, detail="No face detected in selfie")
             
         selfie_encoding = faces[0][0]
         
-        # Vectorized search
-        statement = select(FaceEncoding)
-        face_records = session.exec(statement).all()
+        # 2. High-Performance Vector Search (FAISS HNSW)
+        matched_face_ids = processor.query(selfie_encoding, k=50)
         
-        if not face_records:
+        if not matched_face_ids:
             return []
 
-        known_encodings = [
-            face_recognizer.deserialize_encoding(r.encoding_json) 
-            for r in face_records
-        ]
+        # 3. Retrieve Photo Metadata
+        # Get unique photo IDs from the matched face IDs
+        face_records = session.exec(
+            select(FaceEncoding).where(FaceEncoding.id.in_(matched_face_ids))
+        ).all()
         
-        matches = face_recognizer.compare_faces_batch(known_encodings, selfie_encoding)
+        matched_photo_ids = list(set(r.photo_id for r in face_records))
         
-        matched_photo_ids = {
-            face_records[i].photo_id 
-            for i, is_match in enumerate(matches) 
-            if is_match
-        }
-        
-        # Get photos
         if not matched_photo_ids:
             return []
             
-        photos = session.exec(select(Photo).where(Photo.id.in_(list(matched_photo_ids)))).all()
+        photos = session.exec(select(Photo).where(Photo.id.in_(matched_photo_ids))).all()
         return photos
         
     finally:
