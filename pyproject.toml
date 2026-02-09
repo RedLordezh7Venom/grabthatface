@@ -1,0 +1,30 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "celery>=5.6.2",
+    "face-recognition>=1.3.0",
+    "faiss-cpu>=1.13.2",
+    "fastapi>=0.128.5",
+    "httpx>=0.28.1",
+    "loguru>=0.7.3",
+    "mlflow>=3.9.0",
+    "numpy>=2.4.2",
+    "opencv-python-headless>=4.13.0.92",
+    "passlib[bcrypt]>=1.7.4",
+    "pillow>=12.1.0",
+    "prometheus-client>=0.24.1",
+    "psycopg2-binary>=2.9.11",
+    "pydantic-settings>=2.12.0",
+    "pytest>=9.0.2",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.22",
+    "redis>=7.1.0",
+    "requests>=2.32.5",
+    "setuptools>=82.0.0",
+    "sqlmodel>=0.0.32",
+    "uvicorn[standard]>=0.40.0",
+]

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/grabthatface
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - db
+      - redis
+    networks:
+      - frontend
+      - backend
+
+  worker:
+    build: .
+    command: celery -A app.workers.tasks worker --loglevel=info -Q face-indexing
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/grabthatface
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5000:5000"
+    networks:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres_data:

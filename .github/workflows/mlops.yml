@@ -1,0 +1,48 @@
+name: MLOps Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+          
+      - name: Lint with Flake8
+        run: |
+          pip install flake8
+          flake8 app --count --select=E9,F63,F7,F82 --show-source --statistics
+          
+      - name: Run Model Validation Tests
+        run: |
+          # Verify the face recognition model accuracy on a benchmark dataset
+          # This is the "ML" part of CI/CD
+          pytest tests/test_model_accuracy.py
+          
+      - name: Component Tests
+        run: |
+          pytest tests/test_api.py
+
+  deploy-canary:
+    needs: test-and-validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to K8s Canary
+        run: |
+          echo "Deploying to production-canary namespace (10% traffic)..."
+          # helm upgrade --install grabthatface-canary ./charts/grabthatface --set trafficSplit=10
