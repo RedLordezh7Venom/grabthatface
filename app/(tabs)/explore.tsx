@@ -8,7 +8,8 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-  Platform
+  Platform,
+  Dimensions
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
