@@ -24,6 +24,8 @@ class VisionRAGProcessor:
             mlflow.set_experiment("grabthatface-vision-rag")
         except Exception as e:
             logger.warning(f"VisionRAG: MLflow tracking unavailable: {e}")
+            
+        self.last_synced_id = 0
         logger.info("VisionRAGProcessor initialized with FAISS HNSW index")
 
     def extract_features(self, image_path: str) -> List[Tuple[np.ndarray, List[int]]]:
@@ -78,5 +80,26 @@ class VisionRAGProcessor:
     def load_index(self, path: str = "data/faiss_index.bin"):
         if os.path.exists(path):
             self.index = faiss.read_index(path)
+
+    def sync_with_db(self, engine):
+        """
+        Incrementally synchronize the in-memory index with the SQL database.
+        """
+        from sqlmodel import Session, select
+        import json
+        from app.models import FaceEncoding
+
+        with Session(engine) as session:
+            # Fetch all records with ID > last_synced_id
+            statement = select(FaceEncoding).where(FaceEncoding.id > self.last_synced_id).order_by(FaceEncoding.id)
+            new_records = session.exec(statement).all()
+            
+            if new_records:
+                logger.info(f"VisionRAG: Syncing {len(new_records)} new faces from DB...")
+                for r in new_records:
+                    encoding = np.array(json.loads(r.encoding_json))
+                    self.add_to_index(r.id, encoding)
+                    self.last_synced_id = r.id
+                logger.info(f"VisionRAG: Sync complete. Total indexed: {self.index.ntotal}")
 
 processor = VisionRAGProcessor()
