@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { ArrowLeft, UploadCloud, CheckCircle, AlertCircle, Image as ImageIcon, Loader2, Activity, Terminal, ShieldCheck } from "lucide-react";
+import { ArrowLeft, UploadCloud, CheckCircle, AlertCircle, Loader2, Activity, Terminal, ShieldCheck, Cpu, Database, Share2 } from "lucide-react";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -50,17 +50,17 @@ export default function AdminUpload() {
         setUploading(false);
         setStatus({
             type: errorCount === 0 ? "success" : "error",
-            message: `Event Index Updated: ${successCount} entries synced. ${errorCount > 0 ? `${errorCount} nodes failed.` : ""}`
+            message: `Cluster Sync Complete: ${successCount} entries indexed. ${errorCount > 0 ? `${errorCount} nodes failed.` : ""}`
         });
         setFiles([]);
     };
 
     return (
-        <main className="min-h-screen bg-[#030303] text-white selection:bg-indigo-500/30 overflow-x-hidden font-sans">
-            {/* Command Center Overlay */}
-            <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                <div className="absolute top-20 left-10 w-px h-64 bg-gradient-to-b from-indigo-500/20 to-transparent" />
+        <main className="min-h-screen bg-[#000] text-white selection:bg-indigo-500/30 overflow-x-hidden font-sans">
+            {/* Visionary Mesh Background */}
+            <div className="mesh-container">
+                <div className="mesh-sphere w-[60%] h-[60%] top-0 -left-[10%] bg-purple-600/10" />
+                <div className="mesh-sphere w-[50%] h-[50%] bottom-0 -right-[10%] bg-indigo-600/10" style={{ animationDelay: '-5s' }} />
             </div>
 
             <nav className="relative z-10 p-8 flex justify-between items-center max-w-7xl mx-auto border-b border-white/5">
@@ -69,27 +69,29 @@ export default function AdminUpload() {
                     Terminal Exit
                 </Link>
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
+                    <div className="hidden md:flex items-center gap-3 glass-card px-4 py-2 bg-white/[0.01] border-white/5">
                         <Activity size={14} className="text-indigo-500 animate-pulse" />
-                        <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">Vision Node: Delta-01</span>
+                        <span className="text-[10px] font-mono text-white/30 uppercase tracking-widest leading-none">Node: Delta-01 // ACTIVE</span>
                     </div>
                 </div>
             </nav>
 
-            <div className="relative z-10 max-w-3xl mx-auto px-6 pt-20 pb-24">
-                <header className="mb-16 space-y-4 text-center lg:text-left">
-                    <h1 className="text-6xl font-[900] tracking-tighter italic uppercase leading-none">
-                        Event Control
+            <div className="relative z-10 max-w-4xl mx-auto px-6 pt-20 pb-24">
+                <header className="mb-20 space-y-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 font-mono text-[10px] uppercase text-indigo-400 font-black tracking-widest">
+                        <Database size={12} /> Data Pipeline Stage 0
+                    </div>
+                    <h1 className="text-7xl font-[1000] tracking-tighter italic uppercase leading-[0.8]">
+                        Event <br /> Command
                     </h1>
-                    <p className="text-lg text-white/40 max-w-xl font-light leading-relaxed">
-                        Deploy your event assets to the global biometric mesh.
-                        attendees will receive instant neural match notifications.
+                    <p className="text-xl text-white/40 max-w-xl font-light leading-relaxed pt-4">
+                        Push raw visual assets to the neural indexing cluster. attendees will receive instant match notifications via the biometric mesh.
                     </p>
                 </header>
 
-                <div className="space-y-8">
+                <div className="space-y-10">
                     {/* Uploader Hub */}
-                    <div className="glass-card p-12 group hover:border-indigo-500/20 transition-all cursor-pointer relative overflow-hidden bg-white/[0.01]">
+                    <div className="glass-card p-20 group hover:border-indigo-500/30 transition-all cursor-pointer relative overflow-hidden bg-white/[0.01] text-center border-dashed border-white/10 glass-card-hover">
                         <input
                             type="file"
                             multiple
@@ -97,16 +99,16 @@ export default function AdminUpload() {
                             onChange={onFileChange}
                             className="absolute inset-0 opacity-0 cursor-pointer z-10"
                         />
-                        <div className="flex flex-col items-center gap-8 relative z-20">
-                            <div className="w-24 h-24 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-700 shadow-[0_0_40px_rgba(99,102,241,0.1)]">
-                                <UploadCloud size={40} />
+                        <div className="flex flex-col items-center gap-10 relative z-20">
+                            <div className="w-28 h-28 rounded-[32px] bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-700 shadow-2xl">
+                                <UploadCloud size={48} />
                             </div>
-                            <div className="text-center">
-                                <p className="text-2xl font-black uppercase italic tracking-tighter mb-2">
-                                    {files.length > 0 ? `${files.length} Assets Loaded` : "Input Event Data"}
+                            <div className="space-y-3">
+                                <p className="text-4xl font-[1000] uppercase italic tracking-tighter">
+                                    {files.length > 0 ? `${files.length} Assets Loaded` : "Input Source Data"}
                                 </p>
-                                <p className="text-xs text-white/20 uppercase tracking-[0.3em] font-bold">
-                                    Supported: RAW, JPG, PNG // Bulk enabled
+                                <p className="text-xs text-white/20 uppercase tracking-[0.4em] font-black">
+                                    Supported: RAW, JPG, PNG // Bulk Deployment Active
                                 </p>
                             </div>
                         </div>
@@ -115,63 +117,89 @@ export default function AdminUpload() {
                     {files.length > 0 && !uploading && (
                         <button
                             onClick={handleUpload}
-                            className="w-full h-20 rounded-3xl bg-white text-black font-[900] text-xl uppercase italic tracking-tighter transition-all hover:bg-indigo-50 active:scale-[0.98] shadow-2xl flex items-center justify-center gap-4 group"
+                            className="w-full h-24 rounded-[32px] bg-white text-black font-[1000] text-2xl uppercase italic tracking-tighter transition-all hover:bg-neutral-200 active:scale-[0.98] shadow-[0_20px_50px_rgba(255,255,255,0.2)] flex items-center justify-center gap-6 group overflow-hidden relative"
                         >
-                            Execute Deployment
-                            <Terminal size={24} className="group-hover:translate-x-2 transition-transform" />
+                            <div className="absolute inset-0 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700 opacity-10" />
+                            Execute Sync
+                            <Terminal size={28} className="group-hover:translate-x-3 transition-transform duration-500" />
                         </button>
                     )}
 
                     {uploading && (
-                        <div className="glass-card p-10 space-y-6 bg-white/[0.02]">
+                        <div className="glass-card p-12 space-y-10 bg-white/[0.02]">
                             <div className="flex justify-between items-end">
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-mono text-indigo-400 uppercase font-black tracking-widest">Provisioning Mesh</span>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter">Indexing {progress}%</h3>
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
+                                        <span className="text-[10px] font-black font-mono text-indigo-400 uppercase tracking-widest">Provisioning Mesh</span>
+                                    </div>
+                                    <h3 className="text-4xl font-[1000] italic uppercase tracking-tighter">Indexing {progress}%</h3>
                                 </div>
-                                <Loader2 size={32} className="animate-spin text-white/20" />
+                                <Loader2 size={40} className="animate-spin text-white/10" />
                             </div>
-                            <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden p-1 border border-white/5">
+                            <div className="h-6 w-full bg-white/5 rounded-full overflow-hidden p-1.5 border border-white/5">
                                 <div
-                                    className="h-full bg-indigo-500 rounded-full transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_0_20px_rgba(99,102,241,0.8)]"
+                                    className="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] shadow-[0_0_30px_rgba(99,102,241,0.8)]"
                                     style={{ width: `${progress}%` }}
                                 />
                             </div>
-                            <div className="flex items-center gap-3 text-[10px] text-white/30 font-mono uppercase tracking-[0.2em]">
-                                <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-ping" />
-                                Extracting 128D Face Encodings...
+                            <div className="grid grid-cols-2 gap-8 pt-4">
+                                <div className="space-y-2">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Extraction</p>
+                                    <p className="text-sm font-mono text-indigo-300">Face Vectorizing...</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Throughput</p>
+                                    <p className="text-sm font-mono text-indigo-300">12.4 Assets / Sec</p>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {status && (
-                        <div className={`p-8 rounded-[32px] border flex items-center gap-6 animate-fade-in ${status.type === 'success'
+                        <div className={`p-10 rounded-[40px] border flex items-center gap-8 animate-fade-in ${status.type === 'success'
                                 ? 'bg-green-500/5 border-green-500/20 text-green-400'
                                 : 'bg-red-500/5 border-red-500/20 text-red-400'
                             }`}>
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${status.type === 'success' ? 'bg-green-500/20' : 'bg-red-500/20'}`}>
-                                {status.type === 'success' ? <CheckCircle size={24} /> : <AlertCircle size={24} />}
+                            <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center ${status.type === 'success' ? 'bg-green-500/10 shadow-[0_0_20px_rgba(34,197,94,0.2)]' : 'bg-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.2)]'}`}>
+                                {status.type === 'success' ? <CheckCircle size={32} /> : <AlertCircle size={32} />}
                             </div>
-                            <p className="text-lg font-black italic uppercase tracking-tighter">{status.message}</p>
+                            <div className="space-y-1">
+                                <p className="text-2xl font-[1000] italic uppercase tracking-tighter">{status.message}</p>
+                                <p className="text-[10px] font-mono uppercase tracking-[0.4em] opacity-60">Session Log: Index:delta-sync-01</p>
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Dashboard Stats */}
-                <div className="mt-20 grid grid-cols-2 gap-6 opacity-20">
-                    <div className="glass-card p-6 border-white/5 space-y-2">
-                        <p className="text-[9px] font-mono uppercase tracking-widest">Global Latency</p>
-                        <p className="text-2xl font-black italic uppercase">12ms</p>
+                <div className="mt-32 grid grid-cols-3 gap-8">
+                    <div className="glass-card p-8 border-white/5 space-y-3 glass-card-hover group">
+                        <Share2 size={24} className="text-white/20 group-hover:text-indigo-400 transition-colors" />
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">Peer Mesh</p>
+                            <p className="text-3xl font-[1000] italic uppercase leading-none">Global</p>
+                        </div>
                     </div>
-                    <div className="glass-card p-6 border-white/5 space-y-2">
-                        <p className="text-[9px] font-mono uppercase tracking-widest">Secure Uplink</p>
-                        <p className="text-2xl font-black italic uppercase items-center flex gap-3">Live <ShieldCheck size={20} className="text-green-500" /></p>
+                    <div className="glass-card p-8 border-white/5 space-y-3 glass-card-hover group">
+                        <ShieldCheck size={24} className="text-white/20 group-hover:text-indigo-400 transition-colors" />
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">Encrypted</p>
+                            <p className="text-3xl font-[1000] italic uppercase leading-none">AES-256</p>
+                        </div>
+                    </div>
+                    <div className="glass-card p-8 border-white/5 space-y-3 glass-card-hover group">
+                        <Cpu size={24} className="text-white/20 group-hover:text-indigo-400 transition-colors" />
+                        <div>
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 mb-1">Latency</p>
+                            <p className="text-3xl font-[1000] italic uppercase leading-none">12ms</p>
+                        </div>
                     </div>
                 </div>
 
-                <footer className="mt-24 pt-12 border-t border-white/5 flex justify-between items-center text-white/10 font-mono text-[9px] uppercase tracking-[0.4em]">
-                    <span>Node Cluster // Delta</span>
-                    <span>vision rAG pipeline v1.0.4</span>
+                <footer className="mt-32 pt-16 border-t border-white/5 flex justify-between items-center text-white/10 font-mono text-[10px] uppercase tracking-[0.5em]">
+                    <span>Node Cluster // Delta-01</span>
+                    <span>Vision Architecture v1.0.4</span>
                 </footer>
             </div>
         </main>

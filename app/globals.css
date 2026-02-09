@@ -119,3 +119,41 @@ body {
   opacity: 0.15;
   animation: meshFlow 20s ease-in-out infinite;
 }
+
+@keyframes scan-line {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-scan {
+  animation: scan-line 3s ease-in-out infinite;
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 3s linear infinite;
+}

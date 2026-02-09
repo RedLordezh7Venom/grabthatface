@@ -1,4 +1,3 @@
-```javascript
 import Link from "next/link";
 import { Camera, Upload, Sparkles, Zap, Shield, Image as ImageIcon, Flame, TrendingUp, Users, ChevronRight } from "lucide-react";
 
@@ -24,19 +23,19 @@ export default function Home() {
         {/* High-Impact Hero Section */}
         <div className="text-center mb-24 animate-fade-in opacity-0" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
           <div className="relative inline-block">
-            <h1 className="text-8xl md:text-[11rem] font-[1000] tracking-tighter mb-8 premium-gradient leading-[0.8] select-none">
+            <h1 className="text-8xl md:text-[11.5rem] font-[1000] tracking-tighter mb-8 premium-gradient leading-[0.75] select-none uppercase italic">
               GrabThatFace
             </h1>
             <div className="absolute -top-6 -right-12 animate-float">
-                <div className="glass-card px-3 py-1 text-[10px] font-mono border-indigo-500/30 uppercase tracking-widest text-indigo-400">Beta 1.0</div>
+              <div className="glass-card px-3 py-1 text-[10px] font-mono border-indigo-500/30 uppercase tracking-widest text-indigo-400">Node v1.0.4</div>
             </div>
           </div>
-          
-          <p className="text-2xl md:text-4xl text-white/60 max-w-4xl mx-auto leading-[1.1] font-light mt-12 tracking-tight">
-            Stop scrolling 4,000 photos for <span className="text-white font-medium underline decoration-indigo-500/50 underline-offset-8">one good pic</span>. <br/>
+
+          <p className="text-2xl md:text-4xl text-white/60 max-w-4xl mx-auto leading-[1.1] font-light mt-14 tracking-tight">
+            Stop searching 4,000 photos for <span className="text-white font-medium underline decoration-indigo-500/50 underline-offset-8">one good pic</span>. <br />
             Claim your <span className="italic font-serif text-indigo-300">Main Character</span> moments instantly.
           </p>
-          
+
           <div className="mt-16 flex flex-wrap justify-center gap-10 opacity-30 hover:opacity-60 transition-opacity">
             <div className="flex items-center gap-3 text-xs font-mono uppercase tracking-[0.3em]">
               <Users size={16} /> 1.2M SCANS
@@ -53,7 +52,7 @@ export default function Home() {
             <div className="glass-card glass-card-hover p-14 h-full flex flex-col items-start text-left gap-10 relative overflow-hidden group">
               {/* Animated HUD line */}
               <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-indigo-500/50 to-transparent scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-top" />
-              
+
               <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-500 shadow-xl">
                 <Camera size={32} />
               </div>
@@ -62,7 +61,7 @@ export default function Home() {
                 <p className="text-lg text-white/40 leading-relaxed max-w-[340px] font-light">
                   Deploy biometric scan to retrieve every visual asset encoded with your face.
                 </p>
-                <div className="inline-flex items-center gap-2 text-indigo-400 text-xs font-black uppercase tracking-[0.4em] pt-4 group-hover:gap-4 transition-all">
+                <div className="inline-flex items-center gap-2 text-indigo-400 text-xs font-black uppercase tracking-[0.4em] pt-4 group-hover:gap-4 transition-all focus:outline-none">
                   Launch Scan <ChevronRight size={14} />
                 </div>
               </div>
@@ -71,8 +70,8 @@ export default function Home() {
 
           <Link href="/admin" className="group">
             <div className="glass-card glass-card-hover p-14 h-full flex flex-col items-start text-left gap-10 relative overflow-hidden group">
-               {/* Animated HUD line */}
-               <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-purple-500/50 to-transparent scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-top" />
+              {/* Animated HUD line */}
+              <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-purple-500/50 to-transparent scale-y-0 group-hover:scale-y-100 transition-transform duration-700 origin-top" />
 
               <div className="w-16 h-16 rounded-[24px] bg-white/5 flex items-center justify-center text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-all duration-500 shadow-xl">
                 <Upload size={32} />
@@ -82,7 +81,7 @@ export default function Home() {
                 <p className="text-lg text-white/40 leading-relaxed max-w-[340px] font-light">
                   Push raw event data to the indexing cluster. Metadata extraction happens on edge.
                 </p>
-                <div className="inline-flex items-center gap-2 text-purple-400 text-xs font-black uppercase tracking-[0.4em] pt-4 group-hover:gap-4 transition-all">
+                <div className="inline-flex items-center gap-2 text-purple-400 text-xs font-black uppercase tracking-[0.4em] pt-4 group-hover:gap-4 transition-all focus:outline-none">
                   Access Portal <ChevronRight size={14} />
                 </div>
               </div>
@@ -117,4 +116,3 @@ export default function Home() {
     </main>
   );
 }
-```
