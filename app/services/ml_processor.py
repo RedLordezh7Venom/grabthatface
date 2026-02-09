@@ -20,7 +20,10 @@ class VisionRAGProcessor:
         self.metadata_map = {} # Maps index ID to internal database ID
         self._lock = threading.Lock() # For thread-safety within a process
         
-        mlflow.set_experiment("grabthatface-vision-rag")
+        try:
+            mlflow.set_experiment("grabthatface-vision-rag")
+        except Exception as e:
+            logger.warning(f"VisionRAG: MLflow tracking unavailable: {e}")
         logger.info("VisionRAGProcessor initialized with FAISS HNSW index")
 
     def extract_features(self, image_path: str) -> List[Tuple[np.ndarray, List[int]]]:
