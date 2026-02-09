@@ -28,14 +28,33 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow GrabThatFace to use the camera to find your neural identity."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to upload assets to the event archive."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow the app to save neural matches to your gallery.",
+          "savePhotosPermission": "Allow the app to save neural matches to your gallery."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#020617",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#020617"
           }
         }
       ]
