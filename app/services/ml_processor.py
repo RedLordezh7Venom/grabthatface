@@ -28,6 +28,7 @@ class VisionRAGProcessor:
             # Use hog for CPU-bound production environments
             face_locations = face_recognition.face_locations(image, model="hog")
             face_encodings = face_recognition.face_encodings(image, face_locations)
+            logger.debug(f"VisionRAG: Found {len(face_encodings)} faces in {image_path}")
             return list(zip(face_encodings, face_locations))
         except Exception as e:
             logger.error(f"VisionRAG: Feature extraction failed for {image_path}: {e}")
@@ -59,10 +60,12 @@ class VisionRAGProcessor:
         threshold = settings.FACE_RECOGNITION_TOLERANCE ** 2
         matches = []
         for dist, idx in zip(distances[0], indices[0]):
-            if idx != -1 and dist <= threshold:
-                face_id = self.metadata_map.get(idx)
-                if face_id:
-                    matches.append(face_id)
+            if idx != -1:
+                logger.debug(f"VisionRAG Search: idx={idx}, distance={dist:.4f} (threshold={threshold:.4f})")
+                if dist <= threshold:
+                    face_id = self.metadata_map.get(idx)
+                    if face_id:
+                        matches.append(face_id)
                     
         return matches
 
