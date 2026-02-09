@@ -7,6 +7,7 @@ requires-python = ">=3.14"
 dependencies = [
     "celery>=5.6.2",
     "face-recognition>=1.3.0",
+    "face-recognition-models",
     "faiss-cpu>=1.13.2",
     "fastapi>=0.128.5",
     "httpx>=0.28.1",
@@ -28,3 +29,6 @@ dependencies = [
     "sqlmodel>=0.0.32",
     "uvicorn[standard]>=0.40.0",
 ]
+
+[tool.uv.sources]
+face-recognition-models = { git = "https://github.com/ageitgey/face_recognition_models" }

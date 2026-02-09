@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     STORAGE_PATH: str = "data/uploads"
     FACE_DIR: str = "data/faces"
     
-    class Config:
-        case_sensitive = True
+    model_config = {
+        "case_sensitive": True
+    }
 
 settings = Settings()
