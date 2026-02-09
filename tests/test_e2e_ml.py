@@ -61,6 +61,7 @@ def test_ml_recall_on_real_dataset(client: TestClient, session: Session):
         
         assert response.status_code == 200
         results = response.json()
+        print(f"Query {person_id}: Found {len(results)} matches. Results: {results}")
         
         # Check if any result belongs to the correct subject
         # Note: Photo event_id contains the person_id
