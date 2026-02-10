@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: grabthatface
+  labels:
+    app: worker
+    component: backend
+spec:
+  replicas: 2  # Start with 2 workers
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+        component: backend
+    spec:
+      initContainers:
+      # Wait for dependencies
+      - name: wait-for-postgres
+        image: busybox:latest
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
+      - name: wait-for-redis
+        image: busybox:latest
+        command: ['sh', '-c', 'until nc -z redis-service 6379; do echo waiting for redis; sleep 2; done;']
+      - name: wait-for-qdrant
+        image: busybox:latest
+        command: ['sh', '-c', 'until nc -z qdrant-service 6333; do echo waiting for qdrant; sleep 2; done;']
+      
+      containers:
+      - name: worker
+        image: grabthatface/worker:latest  # Build and push your image
+        command:
+        - celery
+        - -A
+        - app.workers.celery_app
+        - worker
+        - --loglevel=info
+        - --concurrency=4
+        - --max-tasks-per-child=100
+        - --time-limit=300
+        - --soft-time-limit=280
+        envFrom:
+        - configMapRef:
+            name: grabthatface-config
+        - secretRef:
+            name: grabthatface-secrets
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/data/uploads
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worker-hpa
+  namespace: grabthatface
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
