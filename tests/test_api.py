@@ -7,30 +7,33 @@ def test_health_check(client: TestClient):
     assert response.status_code == 200
     assert response.json()["status"] == "healthy"
 
+from unittest.mock import patch
+
 def test_photo_upload_basic(client: TestClient):
     """
     Test that uploading a valid image returns a 200 and a processing status.
     """
-    # Create a tiny dummy image
-    from PIL import Image
-    import io
-    
-    img = Image.new('RGB', (100, 100), color=(73, 109, 137))
-    img_byte_arr = io.BytesIO()
-    img.save(img_byte_arr, format='JPEG')
-    img_byte_arr = img_byte_arr.getvalue()
+    with patch("app.api.v1.endpoints.photos.process_photo_and_extract_faces.delay") as mock_celery:
+        # Create a tiny dummy image
+        from PIL import Image
+        import io
+        
+        img = Image.new('RGB', (100, 100), color=(73, 109, 137))
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='JPEG')
+        img_byte_arr = img_byte_arr.getvalue()
 
-    response = client.post(
-        "/api/v1/photos/",
-        files={"file": ("test.jpg", img_byte_arr, "image/jpeg")},
-        data={"event_id": "test_event"}
-    )
-    
-    # We expect success because the endpoint uses BackgroundTasks
-    assert response.status_code == 200
-    data = response.json()
-    assert "id" in data
-    assert data["status"] == "processing"
+        response = client.post(
+            "/api/v1/photos/",
+            files={"file": ("test.jpg", img_byte_arr, "image/jpeg")},
+            data={"event_id": "test_event"}
+        )
+        
+        # We expect success because the endpoint uses BackgroundTasks
+        assert response.status_code == 200
+        data = response.json()
+        assert "id" in data
+        assert data["status"] == "processing"
 
 def test_search_no_face(client: TestClient):
     """
