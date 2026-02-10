@@ -6,4 +6,1788 @@ plugins: anyio-4.12.1
 collected 11 items
 
 tests/test_api.py .F.                                                    [ 27%]
-tests/test_e2e_ml.py 
+tests/test_e2e_ml.py FFE                                                 [ 45%]
+tests/test_model_accuracy.py ..                                          [ 63%]
+tests/test_performance.py ..                                             [ 81%]
+tests/test_scalable.py ..                                                [100%]
+
+==================================== ERRORS ====================================
+______________ ERROR at teardown of test_ml_false_discovery_rate _______________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f7570599040>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x7f7571e96850>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x7f756bf54af0>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteDDLCompiler object at 0x7f7571679db0>
+parameters = [()]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1967: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x7f7571e96850>
+cursor = <sqlite3.Cursor object at 0x7f75716dc540>
+statement = '\nDROP TABLE faceencoding', parameters = ()
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x7f756bf54af0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.OperationalError: attempt to write a readonly database
+
+venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f7571c6e140>
+
+    @pytest.fixture(name="session")
+    def session_fixture(monkeypatch):
+        test_engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
+        # Patch the global engine so background tasks use the test database
+        monkeypatch.setattr(app.database, "engine", test_engine)
+    
+        SQLModel.metadata.create_all(test_engine)
+        with Session(test_engine) as session:
+            yield session
+    
+>       SQLModel.metadata.drop_all(test_engine)
+
+tests/conftest.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:5956: in drop_all
+    bind._run_ddl_visitor(
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:3260: in _run_ddl_visitor
+    conn._run_ddl_visitor(visitorcallable, element, **kwargs)
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2467: in _run_ddl_visitor
+    ).traverse_single(element)
+      ^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/sqlalchemy/sql/visitors.py:661: in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/sqlalchemy/sql/ddl.py:1142: in visit_metadata
+    self.traverse_single(
+venv/lib/python3.14/site-packages/sqlalchemy/sql/visitors.py:661: in traverse_single
+    return meth(obj, **kw)
+           ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/sqlalchemy/sql/ddl.py:1209: in visit_table
+    DropTable(table)._invoke_with(self.connection)
+venv/lib/python3.14/site-packages/sqlalchemy/sql/ddl.py:321: in _invoke_with
+    return bind.execute(self)
+           ^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1419: in execute
+    return meth(
+venv/lib/python3.14/site-packages/sqlalchemy/sql/ddl.py:187: in _execute_on_connection
+    return connection._execute_ddl(
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1530: in _execute_ddl
+    ret = self._execute_context(
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1846: in _execute_context
+    return self._exec_single_context(
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1986: in _exec_single_context
+    self._handle_dbapi_exception(
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:2363: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x7f7571e96850>
+cursor = <sqlite3.Cursor object at 0x7f75716dc540>
+statement = '\nDROP TABLE faceencoding', parameters = ()
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x7f756bf54af0>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) attempt to write a readonly database
+E       [SQL: 
+E       DROP TABLE faceencoding]
+E       (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py:952: OperationalError
+----------------------------- Captured stderr call -----------------------------
+2026-02-09 15:41:19.082 | DEBUG    | logging:callHandlers:1737 - Using selector: EpollSelector
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[36:55]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[57:83]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[87:100]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[138:157]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[159:206]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[208:220]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[222:232]
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[236:5182]
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_end with no data
+2026-02-09 15:41:19.092 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (0/20) now.
+2026-02-09 15:41:19.092 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2026-02-09 15:41:20.093 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2026-02-09 15:41:21.094 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2026-02-09 15:41:22.094 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2026-02-09 15:41:23.095 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2026-02-09 15:41:24.096 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2026-02-09 15:41:25.096 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2026-02-09 15:41:26.097 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2026-02-09 15:41:27.098 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2026-02-09 15:41:28.099 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2026-02-09 15:41:29.099 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2026-02-09 15:41:30.100 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2026-02-09 15:41:31.101 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2026-02-09 15:41:32.101 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2026-02-09 15:41:33.102 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2026-02-09 15:41:34.103 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2026-02-09 15:41:35.104 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2026-02-09 15:41:36.104 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2026-02-09 15:41:37.105 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2026-02-09 15:41:38.106 | CRITICAL | logging:callHandlers:1737 - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+------------------------------ Captured log call -------------------------------
+DEBUG    asyncio:selector_events.py:64 Using selector: EpollSelector
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[36:55]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[57:83]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[87:100]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[138:157]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[159:206]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[208:220]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[222:232]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[236:5182]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_end with no data
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (0/20) now.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (1/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (2/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (3/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (4/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (5/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (6/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (7/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (8/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (9/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (10/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (11/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (12/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (13/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (14/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (15/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (16/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (17/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (18/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (19/20) in 1.00 second.
+CRITICAL celery.backends.redis:redis.py:135 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+=================================== FAILURES ===================================
+___________________________ test_photo_upload_basic ____________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75701ee120>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+>           yield
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:180: in _consume_from
+    self._pubsub.subscribe(key)
+venv/lib/python3.14/site-packages/redis/client.py:1090: in subscribe
+    ret_val = self.execute_command("SUBSCRIBE", *new_channels.keys())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:914: in execute_command
+    self.connection = self.connection_pool.get_connection()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+During handling of the above exception, another exception occurred:
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75701ee120>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+>               self._ensure(self._reconnect_pubsub, ())
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:428: in ensure
+    return retry_over_time(
+venv/lib/python3.14/site-packages/kombu/utils/functional.py:318: in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:109: in _reconnect_pubsub
+    metas = self.backend.client.mget(self.subscribed_to)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/commands/core.py:2091: in mget
+    return self.execute_command("MGET", *args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:657: in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:663: in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f75716ecb90>
+
+    from unittest.mock import patch
+    
+    def test_photo_upload_basic(client: TestClient):
+        """
+        Test that uploading a valid image returns a 200 and a processing status.
+        """
+        with patch("app.api.v1.endpoints.photos.process_photo_and_extract_faces.delay") as mock_celery:
+            # Create a tiny dummy image
+            from PIL import Image
+            import io
+    
+            img = Image.new('RGB', (100, 100), color=(73, 109, 137))
+            img_byte_arr = io.BytesIO()
+>           img.save(img_byte_arr, format='JPEG')
+
+tests/test_api.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/starlette/testclient.py:546: in post
+    return super().post(
+venv/lib/python3.14/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+venv/lib/python3.14/site-packages/starlette/testclient.py:445: in request
+    return super().request(
+venv/lib/python3.14/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+venv/lib/python3.14/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv/lib/python3.14/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/testclient.py:348: in handle_request
+    raise exc
+venv/lib/python3.14/site-packages/starlette/testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv/lib/python3.14/site-packages/anyio/from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:395: in __get_result
+    raise self._exception
+venv/lib/python3.14/site-packages/anyio/from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/applications.py:1138: in __call__
+    await super().__call__(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+venv/lib/python3.14/site-packages/starlette/_utils.py:87: in collapse_excgroups
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/core/metrics.py:13: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/fastapi/routing.py:121: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/routing.py:107: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/routing.py:426: in app
+    raw_response = await run_endpoint_function(
+venv/lib/python3.14/site-packages/fastapi/routing.py:314: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/v1/endpoints/photos.py:44: in upload_photo
+    process_photo_and_extract_faces.delay(photo.id, file_path)
+venv/lib/python3.14/site-packages/celery/app/task.py:444: in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/app/task.py:608: in apply_async
+    return app.send_task(
+venv/lib/python3.14/site-packages/celery/app/base.py:946: in send_task
+    self.backend.on_task_call(P, task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:417: in on_task_call
+    self.result_consumer.consume_from(task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:172: in consume_from
+    return self.start(task_id)
+           ^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:150: in start
+    self._consume_from(initial_task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:179: in _consume_from
+    with self.reconnect_on_error():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75701ee120>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+                self._ensure(self._reconnect_pubsub, ())
+            except self._connection_errors as e:
+                logger.critical(E_RETRY_LIMIT_EXCEEDED)
+>               raise RuntimeError(E_RETRY_LIMIT_EXCEEDED) from e
+E               RuntimeError: 
+E               Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:136: RuntimeError
+----------------------------- Captured stderr call -----------------------------
+2026-02-09 15:40:39.940 | DEBUG    | logging:callHandlers:1737 - Using selector: EpollSelector
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[36:55]
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[57:83]
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[87:97]
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[135:154]
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[156:199]
+2026-02-09 15:40:39.941 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[201:213]
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[215:225]
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[229:1053]
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:40:39.942 | DEBUG    | logging:callHandlers:1737 - Calling on_end with no data
+2026-02-09 15:40:39.950 | DEBUG    | logging:callHandlers:1737 - 
+def process_photo_and_extract_faces(photo_id, file_path):
+    return 1
+
+2026-02-09 15:40:39.982 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (0/20) now.
+2026-02-09 15:40:39.982 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2026-02-09 15:40:40.983 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2026-02-09 15:40:41.985 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2026-02-09 15:40:42.986 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2026-02-09 15:40:43.986 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2026-02-09 15:40:44.987 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2026-02-09 15:40:45.988 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2026-02-09 15:40:46.988 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2026-02-09 15:40:47.989 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2026-02-09 15:40:48.990 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2026-02-09 15:40:49.990 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2026-02-09 15:40:50.991 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2026-02-09 15:40:51.992 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2026-02-09 15:40:52.992 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2026-02-09 15:40:53.993 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2026-02-09 15:40:54.994 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2026-02-09 15:40:55.995 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2026-02-09 15:40:56.996 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2026-02-09 15:40:57.997 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2026-02-09 15:40:58.998 | CRITICAL | logging:callHandlers:1737 - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+------------------------------ Captured log call -------------------------------
+DEBUG    asyncio:selector_events.py:64 Using selector: EpollSelector
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[36:55]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[57:83]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[87:97]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[135:154]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[156:199]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[201:213]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[215:225]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[229:1053]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_end with no data
+DEBUG    celery.utils.functional:functional.py:335 
+def process_photo_and_extract_faces(photo_id, file_path):
+    return 1
+
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (0/20) now.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (1/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (2/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (3/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (4/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (5/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (6/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (7/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (8/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (9/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (10/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (11/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (12/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (13/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (14/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (15/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (16/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (17/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (18/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (19/20) in 1.00 second.
+CRITICAL celery.backends.redis:redis.py:135 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+________________________ test_ml_recall_on_real_dataset ________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75716ef890>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+>           yield
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:180: in _consume_from
+    self._pubsub.subscribe(key)
+venv/lib/python3.14/site-packages/redis/client.py:1090: in subscribe
+    ret_val = self.execute_command("SUBSCRIBE", *new_channels.keys())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:914: in execute_command
+    self.connection = self.connection_pool.get_connection()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+During handling of the above exception, another exception occurred:
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75716ef890>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+>               self._ensure(self._reconnect_pubsub, ())
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:428: in ensure
+    return retry_over_time(
+venv/lib/python3.14/site-packages/kombu/utils/functional.py:318: in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:109: in _reconnect_pubsub
+    metas = self.backend.client.mget(self.subscribed_to)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/commands/core.py:2091: in mget
+    return self.execute_command("MGET", *args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:657: in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:663: in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f756bf23bb0>
+session = <sqlmodel.orm.session.Session object at 0x7f7571786650>
+
+    def test_ml_recall_on_real_dataset(client: TestClient, session: Session):
+        """
+        Accuracy Requirement: Test system with Olivetti faces.
+        1. Index 5 subjects (5 images each).
+        2. Query with a different image of the same subjects.
+        3. Verify recall > 80%.
+        """
+        dataset_path = Path("tests/data/faces/olivetti")
+        subjects = sorted([d for d in dataset_path.iterdir() if d.is_dir()])[:5]
+    
+        # Reset index for clean test
+        import faiss
+        processor.index = faiss.IndexHNSWFlat(128, 32)
+        processor.metadata_map = {}
+    
+        # 1. Indexing Phase
+        print("\nIndexing test subjects...")
+        for subject_dir in subjects:
+            person_id = subject_dir.name
+            # Index first 5 images
+            subject_images = sorted(list(subject_dir.glob("*.jpg")))[:5]
+    
+            for img_path in subject_images:
+                with open(img_path, "rb") as f:
+>                   response = client.post(
+                        "/api/v1/photos/",
+                        files={"file": (img_path.name, f, "image/jpeg")},
+                        data={"event_id": f"event_{person_id}"}
+                    )
+
+tests/test_e2e_ml.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/starlette/testclient.py:546: in post
+    return super().post(
+venv/lib/python3.14/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+venv/lib/python3.14/site-packages/starlette/testclient.py:445: in request
+    return super().request(
+venv/lib/python3.14/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+venv/lib/python3.14/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv/lib/python3.14/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/testclient.py:348: in handle_request
+    raise exc
+venv/lib/python3.14/site-packages/starlette/testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv/lib/python3.14/site-packages/anyio/from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:395: in __get_result
+    raise self._exception
+venv/lib/python3.14/site-packages/anyio/from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/applications.py:1138: in __call__
+    await super().__call__(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+venv/lib/python3.14/site-packages/starlette/_utils.py:87: in collapse_excgroups
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/core/metrics.py:13: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/fastapi/routing.py:121: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/routing.py:107: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/routing.py:426: in app
+    raw_response = await run_endpoint_function(
+venv/lib/python3.14/site-packages/fastapi/routing.py:314: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/v1/endpoints/photos.py:44: in upload_photo
+    process_photo_and_extract_faces.delay(photo.id, file_path)
+venv/lib/python3.14/site-packages/celery/app/task.py:444: in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/app/task.py:608: in apply_async
+    return app.send_task(
+venv/lib/python3.14/site-packages/celery/app/base.py:946: in send_task
+    self.backend.on_task_call(P, task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:417: in on_task_call
+    self.result_consumer.consume_from(task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:172: in consume_from
+    return self.start(task_id)
+           ^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:150: in start
+    self._consume_from(initial_task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:179: in _consume_from
+    with self.reconnect_on_error():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75716ef890>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+                self._ensure(self._reconnect_pubsub, ())
+            except self._connection_errors as e:
+                logger.critical(E_RETRY_LIMIT_EXCEEDED)
+>               raise RuntimeError(E_RETRY_LIMIT_EXCEEDED) from e
+E               RuntimeError: 
+E               Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:136: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+
+Indexing test subjects...
+----------------------------- Captured stderr call -----------------------------
+2026-02-09 15:40:59.587 | DEBUG    | logging:callHandlers:1737 - Using selector: EpollSelector
+2026-02-09 15:40:59.588 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:40:59.588 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[36:55]
+2026-02-09 15:40:59.588 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[57:83]
+2026-02-09 15:40:59.588 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[87:102]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[140:159]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[161:208]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[210:222]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[224:234]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[238:5184]
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:40:59.589 | DEBUG    | logging:callHandlers:1737 - Calling on_end with no data
+2026-02-09 15:40:59.598 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (0/20) now.
+2026-02-09 15:40:59.598 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2026-02-09 15:41:00.599 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2026-02-09 15:41:01.600 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2026-02-09 15:41:02.600 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2026-02-09 15:41:03.601 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2026-02-09 15:41:04.602 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2026-02-09 15:41:05.602 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2026-02-09 15:41:06.603 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2026-02-09 15:41:07.604 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2026-02-09 15:41:08.604 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2026-02-09 15:41:09.605 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2026-02-09 15:41:10.606 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2026-02-09 15:41:11.606 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2026-02-09 15:41:12.607 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2026-02-09 15:41:13.608 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2026-02-09 15:41:14.609 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2026-02-09 15:41:15.610 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2026-02-09 15:41:16.610 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2026-02-09 15:41:17.611 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2026-02-09 15:41:18.612 | CRITICAL | logging:callHandlers:1737 - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+------------------------------ Captured log call -------------------------------
+DEBUG    asyncio:selector_events.py:64 Using selector: EpollSelector
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[36:55]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[57:83]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[87:102]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[140:159]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[161:208]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[210:222]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[224:234]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[238:5184]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_end with no data
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (0/20) now.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (1/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (2/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (3/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (4/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (5/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (6/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (7/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (8/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (9/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (10/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (11/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (12/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (13/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (14/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (15/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (16/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (17/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (18/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (19/20) in 1.00 second.
+CRITICAL celery.backends.redis:redis.py:135 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+_________________________ test_ml_false_discovery_rate _________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75717aee90>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+>           yield
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:180: in _consume_from
+    self._pubsub.subscribe(key)
+venv/lib/python3.14/site-packages/redis/client.py:1090: in subscribe
+    ret_val = self.execute_command("SUBSCRIBE", *new_channels.keys())
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:914: in execute_command
+    self.connection = self.connection_pool.get_connection()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+During handling of the above exception, another exception occurred:
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+>               sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+
+venv/lib/python3.14/site-packages/redis/connection.py:855: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/redis/retry.py:116: in call_with_retry
+    return do()
+           ^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:856: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+            ^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:1306: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+    
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 111] Connection refused
+
+venv/lib/python3.14/site-packages/redis/connection.py:1290: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75717aee90>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+>               self._ensure(self._reconnect_pubsub, ())
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/celery/backends/redis.py:428: in ensure
+    return retry_over_time(
+venv/lib/python3.14/site-packages/kombu/utils/functional.py:318: in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:109: in _reconnect_pubsub
+    metas = self.backend.client.mget(self.subscribed_to)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/commands/core.py:2091: in mget
+    return self.execute_command("MGET", *args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:657: in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/client.py:663: in _execute_command
+    conn = self.connection or pool.get_connection()
+                              ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/utils.py:196: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/redis/connection.py:2603: in get_connection
+    connection.connect()
+venv/lib/python3.14/site-packages/redis/connection.py:846: in connect
+    self.connect_check_health(check_health=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+check_health = True, retry_socket_connect = True
+
+    def connect_check_health(
+        self, check_health: bool = True, retry_socket_connect: bool = True
+    ):
+        if self._sock:
+            return
+        try:
+            if retry_socket_connect:
+                sock = self.retry.call_with_retry(
+                    lambda: self._connect(), lambda error: self.disconnect(error)
+                )
+            else:
+                sock = self._connect()
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 111 connecting to localhost:6379. Connection refused.
+
+venv/lib/python3.14/site-packages/redis/connection.py:863: ConnectionError
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f756bf21220>
+session = <sqlmodel.orm.session.Session object at 0x7f756bf20640>
+
+    def test_ml_false_discovery_rate(client: TestClient, session: Session):
+        """
+        Accuracy Requirement: Ensure person not in index is NOT matched.
+        """
+        dataset_path = Path("tests/data/faces/olivetti")
+    
+        # Subject 10 was not indexed in the previous test (if state persisted)
+        # But conftest resets the DB. Let's index subjects 0-4 again.
+        subjects_to_index = sorted([d for d in dataset_path.iterdir() if d.is_dir()])[:5]
+        for subject_dir in subjects_to_index:
+            img_path = sorted(list(subject_dir.glob("*.jpg")))[0]
+            with open(img_path, "rb") as f:
+>               client.post("/api/v1/photos/", files={"file": (img_path.name, f, "image/jpeg")}, data={"event_id": "indexed_event"})
+
+tests/test_e2e_ml.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+venv/lib/python3.14/site-packages/starlette/testclient.py:546: in post
+    return super().post(
+venv/lib/python3.14/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+venv/lib/python3.14/site-packages/starlette/testclient.py:445: in request
+    return super().request(
+venv/lib/python3.14/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+venv/lib/python3.14/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv/lib/python3.14/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/testclient.py:348: in handle_request
+    raise exc
+venv/lib/python3.14/site-packages/starlette/testclient.py:345: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv/lib/python3.14/site-packages/anyio/from_thread.py:334: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:450: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/concurrent/futures/_base.py:395: in __get_result
+    raise self._exception
+venv/lib/python3.14/site-packages/anyio/from_thread.py:259: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/applications.py:1138: in __call__
+    await super().__call__(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+venv/lib/python3.14/site-packages/starlette/_utils.py:87: in collapse_excgroups
+    raise exc
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/core/metrics.py:13: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.14/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.14/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+venv/lib/python3.14/site-packages/fastapi/routing.py:121: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.14/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.14/site-packages/fastapi/routing.py:107: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/fastapi/routing.py:426: in app
+    raw_response = await run_endpoint_function(
+venv/lib/python3.14/site-packages/fastapi/routing.py:314: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/api/v1/endpoints/photos.py:44: in upload_photo
+    process_photo_and_extract_faces.delay(photo.id, file_path)
+venv/lib/python3.14/site-packages/celery/app/task.py:444: in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/app/task.py:608: in apply_async
+    return app.send_task(
+venv/lib/python3.14/site-packages/celery/app/base.py:946: in send_task
+    self.backend.on_task_call(P, task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:417: in on_task_call
+    self.result_consumer.consume_from(task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:172: in consume_from
+    return self.start(task_id)
+           ^^^^^^^^^^^^^^^^^^^
+venv/lib/python3.14/site-packages/celery/backends/redis.py:150: in start
+    self._consume_from(initial_task_id)
+venv/lib/python3.14/site-packages/celery/backends/redis.py:179: in _consume_from
+    with self.reconnect_on_error():
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.14/contextlib.py:162: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <celery.backends.redis.ResultConsumer object at 0x7f75717aee90>
+
+    @contextmanager
+    def reconnect_on_error(self):
+        try:
+            yield
+        except self._connection_errors:
+            try:
+                self._ensure(self._reconnect_pubsub, ())
+            except self._connection_errors as e:
+                logger.critical(E_RETRY_LIMIT_EXCEEDED)
+>               raise RuntimeError(E_RETRY_LIMIT_EXCEEDED) from e
+E               RuntimeError: 
+E               Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+venv/lib/python3.14/site-packages/celery/backends/redis.py:136: RuntimeError
+----------------------------- Captured stderr call -----------------------------
+2026-02-09 15:41:19.082 | DEBUG    | logging:callHandlers:1737 - Using selector: EpollSelector
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[36:55]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[57:83]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[87:100]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_part_begin with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[138:157]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[159:206]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_field with data[208:220]
+2026-02-09 15:41:19.083 | DEBUG    | logging:callHandlers:1737 - Calling on_header_value with data[222:232]
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_header_end with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_headers_finished with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_part_data with data[236:5182]
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_part_end with no data
+2026-02-09 15:41:19.084 | DEBUG    | logging:callHandlers:1737 - Calling on_end with no data
+2026-02-09 15:41:19.092 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (0/20) now.
+2026-02-09 15:41:19.092 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (1/20) in 1.00 second.
+2026-02-09 15:41:20.093 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (2/20) in 1.00 second.
+2026-02-09 15:41:21.094 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (3/20) in 1.00 second.
+2026-02-09 15:41:22.094 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (4/20) in 1.00 second.
+2026-02-09 15:41:23.095 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (5/20) in 1.00 second.
+2026-02-09 15:41:24.096 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (6/20) in 1.00 second.
+2026-02-09 15:41:25.096 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (7/20) in 1.00 second.
+2026-02-09 15:41:26.097 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (8/20) in 1.00 second.
+2026-02-09 15:41:27.098 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (9/20) in 1.00 second.
+2026-02-09 15:41:28.099 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (10/20) in 1.00 second.
+2026-02-09 15:41:29.099 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (11/20) in 1.00 second.
+2026-02-09 15:41:30.100 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (12/20) in 1.00 second.
+2026-02-09 15:41:31.101 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (13/20) in 1.00 second.
+2026-02-09 15:41:32.101 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (14/20) in 1.00 second.
+2026-02-09 15:41:33.102 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (15/20) in 1.00 second.
+2026-02-09 15:41:34.103 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (16/20) in 1.00 second.
+2026-02-09 15:41:35.104 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (17/20) in 1.00 second.
+2026-02-09 15:41:36.104 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (18/20) in 1.00 second.
+2026-02-09 15:41:37.105 | ERROR    | logging:callHandlers:1737 - Connection to Redis lost: Retry (19/20) in 1.00 second.
+2026-02-09 15:41:38.106 | CRITICAL | logging:callHandlers:1737 - 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+
+------------------------------ Captured log call -------------------------------
+DEBUG    asyncio:selector_events.py:64 Using selector: EpollSelector
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[36:55]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[57:83]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[87:100]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_begin with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[138:157]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[159:206]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_field with data[208:220]
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_header_value with data[222:232]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_header_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_headers_finished with no data
+DEBUG    python_multipart.multipart:multipart.py:626 Calling on_part_data with data[236:5182]
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_part_end with no data
+DEBUG    python_multipart.multipart:multipart.py:629 Calling on_end with no data
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (0/20) now.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (1/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (2/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (3/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (4/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (5/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (6/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (7/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (8/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (9/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (10/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (11/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (12/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (13/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (14/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (15/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (16/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (17/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (18/20) in 1.00 second.
+ERROR    celery.backends.redis:redis.py:435 Connection to Redis lost: Retry (19/20) in 1.00 second.
+CRITICAL celery.backends.redis:redis.py:135 
+Retry limit exceeded while trying to reconnect to the Celery redis result store backend. The Celery application must be restarted.
+=============================== warnings summary ===============================
+venv/lib/python3.14/site-packages/face_recognition_models/__init__.py:7
+  /home/provet/Repositories/grabthatface/backend/venv/lib/python3.14/site-packages/face_recognition_models/__init__.py:7: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    from pkg_resources import resource_filename
+
+<frozen importlib._bootstrap>:491
+  <frozen importlib._bootstrap>:491: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:491
+  <frozen importlib._bootstrap>:491: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:491
+  <frozen importlib._bootstrap>:491: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+app/main.py:48
+  /home/provet/Repositories/grabthatface/backend/app/main.py:48: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv/lib/python3.14/site-packages/fastapi/applications.py:4579
+  /home/provet/Repositories/grabthatface/backend/venv/lib/python3.14/site-packages/fastapi/applications.py:4579: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/test_api.py::test_photo_upload_basic
+tests/test_e2e_ml.py::test_ml_recall_on_real_dataset
+tests/test_e2e_ml.py::test_ml_false_discovery_rate
+tests/test_scalable.py::test_upload_flow_with_celery
+  /home/provet/Repositories/grabthatface/backend/venv/lib/python3.14/site-packages/pydantic/fields.py:747: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return fac()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_api.py::test_photo_upload_basic - RuntimeError: 
+FAILED tests/test_e2e_ml.py::test_ml_recall_on_real_dataset - RuntimeError: 
+FAILED tests/test_e2e_ml.py::test_ml_false_discovery_rate - RuntimeError: 
+ERROR tests/test_e2e_ml.py::test_ml_false_discovery_rate - sqlalchemy.exc.Ope...
+============== 3 failed, 8 passed, 10 warnings, 1 error in 59.05s ==============
