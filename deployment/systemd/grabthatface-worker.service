@@ -1,0 +1,50 @@
+[Unit]
+Description=GrabThatFace Celery Worker for Face Processing
+After=network.target postgresql.service redis.service qdrant.service
+Requires=redis.service
+
+[Service]
+Type=forking
+User=grabthatface
+Group=grabthatface
+WorkingDirectory=/opt/grabthatface
+
+# Environment
+EnvironmentFile=/opt/grabthatface/.env
+
+# Celery worker
+ExecStart=/opt/grabthatface/venv/bin/celery -A app.workers.celery_app worker \
+    --loglevel=info \
+    --concurrency=4 \
+    --max-tasks-per-child=100 \
+    --time-limit=300 \
+    --soft-time-limit=280 \
+    --logfile=/var/log/grabthatface/celery-worker.log \
+    --pidfile=/var/run/grabthatface/celery-worker.pid \
+    --detach
+
+ExecStop=/opt/grabthatface/venv/bin/celery -A app.workers.celery_app control shutdown
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=0
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/grabthatface/data /var/log/grabthatface /var/run/grabthatface
+
+[Install]
+WantedBy=multi-user.target

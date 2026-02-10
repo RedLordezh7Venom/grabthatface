@@ -1,0 +1,37 @@
+[Unit]
+Description=Qdrant Vector Database
+After=network.target
+
+[Service]
+Type=simple
+User=qdrant
+Group=qdrant
+WorkingDirectory=/opt/qdrant
+
+# Qdrant binary
+ExecStart=/opt/qdrant/qdrant \
+    --config-path /etc/qdrant/config.yaml
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitInterval=0
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/qdrant /var/log/qdrant
+
+[Install]
+WantedBy=multi-user.target

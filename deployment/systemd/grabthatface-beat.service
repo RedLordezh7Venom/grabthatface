@@ -1,0 +1,41 @@
+[Unit]
+Description=GrabThatFace Celery Beat Scheduler
+After=network.target redis.service grabthatface-worker.service
+Requires=redis.service
+
+[Service]
+Type=forking
+User=grabthatface
+Group=grabthatface
+WorkingDirectory=/opt/grabthatface
+
+# Environment
+EnvironmentFile=/opt/grabthatface/.env
+
+# Celery beat for periodic tasks
+ExecStart=/opt/grabthatface/venv/bin/celery -A app.workers.celery_app beat \
+    --loglevel=info \
+    --logfile=/var/log/grabthatface/celery-beat.log \
+    --pidfile=/var/run/grabthatface/celery-beat.pid \
+    --detach
+
+ExecStop=/bin/kill -TERM $MAINPID
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Graceful shutdown
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/grabthatface/data /var/log/grabthatface /var/run/grabthatface
+
+[Install]
+WantedBy=multi-user.target
