@@ -1,0 +1,31 @@
+graph TD
+    subgraph Client
+        U[User with Selfie] -->|POST /api/v1/search/| S[Search API]
+        O[Organizer with Photos] -->|POST /api/v1/photos/| P[Upload API]
+    end
+
+    subgraph Backend [FastAPI Application]
+        P --> DB[SQLModel / PostgreSQL]
+        P -->|Background Task| Worker[VisionRAG Worker]
+        
+        S --> Extract[MLProcessor: extract_features]
+        Extract --> Query[VisionRAG: FAISS Query]
+        Query --> Result[Match Photo Metadata]
+        Result --> Client
+    end
+
+    subgraph ML_Engine [Vision RAG Engine]
+        Worker --> Detect[Face Detection: HOG]
+        Detect --> Enc[Face Encoding: 128D Vector]
+        Enc --> Index[FAISS HNSW Index: O log N]
+        Index --> Persist[Vector Meta Storage]
+    end
+
+    subgraph Monitoring
+        Metrics[Prometheus Client]
+        Logs[Loguru Structured JSON]
+        Tracking[MLflow Experiment Tracking]
+    end
+
+    Backend -.-> Monitoring
+    ML_Engine -.-> Tracking
