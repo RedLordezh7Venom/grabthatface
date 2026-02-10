@@ -1,7 +1,7 @@
 import shutil
 import os
 import uuid
-from fastapi import APIRouter, UploadFile, File, Depends, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Depends, BackgroundTasks, Form
 from sqlmodel import Session
 from app.database import get_session
 from app.models import Photo, FaceEncoding
@@ -39,7 +39,7 @@ def background_index_faces(photo_id: int, file_path: str):
 async def upload_photo(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    event_id: str = "production-event",
+    event_id: str = Form("production-event"),
     session: Session = Depends(get_session)
 ):
     # 1. Validation (File type, size)
