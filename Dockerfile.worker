@@ -1,0 +1,42 @@
+FROM python:3.11-slim-bullseye
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    libopenblas-dev \
+    liblapack-dev \
+    libssl-dev \
+    libffi-dev \
+    libpq-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app/ ./app/
+
+# Create necessary directories
+RUN mkdir -p /app/data/uploads
+
+# Non-root user for security
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+# Run Celery worker
+CMD ["celery", "-A", "app.workers.celery_app", "worker", \
+     "--loglevel=info", \
+     "--concurrency=4", \
+     "--max-tasks-per-child=100", \
+     "--time-limit=300", \
+     "--soft-time-limit=280"]
