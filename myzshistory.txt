@@ -1,0 +1,999 @@
+  359  sudo systemctl start docker\n
+  360  uvicorn app.main:app --workers 4
+  361  cd ba
+  362  cd back
+  363  ls
+  364  uvicorn app.main:app --workers 4
+  365  source venv/bin/activate
+  366  uvicorn app.main:app --workers 4
+  367  git status
+  368  git log --oneline
+  369  git status
+  370  git status
+  371  git status
+  372  git add .
+  373  git commit -m "moving towards operational working"
+  374  git status
+  375  curl -X POST -F "file=@person_01/image_01.jpg" http://localhost:8000/api/v1/search/\n# Result: Match Found!\n# [{"filename": "...image_00.jpg", "event_id": "demo-event", "id": 2}]
+  376  curl -X POST -F "file=@person_01/image_01.jpg" http://localhost:8000/api/v1/search/\n# Result: Match Found!\n# [{"filename": "...image_00.jpg", "event_id": "demo-event", "id": 2}]
+  377  bash
+  378  cd frontend
+  379  git status
+  380  git stauts
+  381  git status
+  382  git status
+  383   git add .
+  384  git commit -m "made new frontend using new trend research"
+  385  git status
+  386  git add .
+  387  git commit -m "[update] trend research fix"
+  388  git status
+  389  git status
+  390  git add .
+  391  git commit -m "removed bcoz of wrong prompt"
+  392  git status
+  393  git status
+  394  git commit -m "[Antigravity] started with market strategy based design "
+  395  git status
+  396  git add .
+  397  git commit -m "added better design "
+  398  git status
+  399  git status
+  400  git add .
+  401  git commit -m "[Antigravity] used an agent for better uI design " 
+  402  git status
+  403  git status
+  404  git commit -m "improved design"
+  405  git add .
+  406  git commit -m "improved design"
+  407  git status
+  408  cd ..
+  409  ls
+  410  cd ..
+  411  ls
+  412  cd youslackingbro
+  413  git status
+  414  cd ..
+  415  ls
+  416  cd grabthatface
+  417  ls
+  418  ls -la
+  419  git status
+  420  cd frontend
+  421  git status
+  422  git log --oneline
+  423  git status
+  424  git status
+  425  git status
+  426  git status
+  427  git status
+  428  git status
+  429  sudo systemctl start docker\n
+  430  celery -A app.workers.tasks worker --loglevel=info\n
+  431  uv sync
+  432  ls
+  433  cd backend
+  434  celery -A app.workers.tasks worker --loglevel=info\n
+  435  uv sync
+  436  celery -A app.workers.tasks worker --loglevel=info\n
+  437  uv add celery
+  438  celery -A app.workers.tasks worker --loglevel=info\n
+  439  celery
+  440  uv add celery
+  441  pip install celery
+  442  source .venv
+  443  source venv
+  444  source venv/bin/activate
+  445  celery -A app.workers.tasks worker --loglevel=info\n
+  446  cd frontend
+  447  npm run dev
+  448  git status
+  449  git log --oneline
+  450  pwd
+  451  cd ..
+  452  ls
+  453  git status
+  454  git init
+  455  git add .
+  456  cd backend
+  457  git status
+  458  git add .
+  459  git commit -m "initial, used 3 times agents and amde this bullshit"
+  460  git status
+  461  git add Agents.md
+  462  git commit -m "added Agents.md for mlops but let's see how this goes"
+  463  git status
+  464  git add .
+  465  git commit -m "[Antigravity] tests added, but I don't guess it's still fucntional"
+  466  git status
+  467  git add . 
+  468  git commit -m "setting up the data for better testing and fucntioning"
+  469  git stauts
+  470  git status
+  471  git status
+  472  git status
+  473  git add .
+  474  git commit -m "facial recognition and testing setup"
+  475  git status
+  476  df -h
+  477  history 0 | grep ds
+  478  history 0 | grep dc
+  479  history 0 | grep sd
+  480  ls -l lfw_subset.zip
+  481  du -sh lfw_subset.zip
+  482  git status
+  483  git add .
+  484  git commit -m "[Antigravity] added the faces test and data but failed i guess"
+  485  git status
+  486  git log --oneline
+  487  git status
+  488  git add .
+  489  git commit -m "setting up for facial testing again and fix end to end pipeline "
+  490  git status
+  491  git add .
+  492  git commit -m "[Antigravity] added more faces and start debugging"
+  493  git status
+  494  git add .
+  495  git commit -m "[Antigravity] added more faces, and inference accuracy is low "
+  496  pwd
+  497  cd ..
+  498  bash
+  499  df =h
+  500  df -h
+  501  mkdir -p backend/data/uploads backend/data/faces
+  502  cd /home/provet/Repositories/grabthatface/backend
+  503  source venv/bin/activate && pip install --upgrade pip && pip install -r requirements.txt
+  504  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  505  source venv/bin/activate && pip install git+https://github.com/ageitgey/face_recognition_models
+  506  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  507  source venv/bin/activate && pip list | grep face-recognition-models
+  508  source venv/bin/activate && pip install git+https://github.com/ageitgey/face_recognition_models
+  509  source venv/bin/activate && pip list | grep face-recognition-models
+  510  git clone --depth 1 https://github.com/ageitgey/face_recognition_models.git && source venv/bin/activate && cd face_recognition_models && pip install . && cd .. && rm -rf face_recognition_models
+  511  source venv/bin/activate && pip list | grep face-recognition-models
+  512  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  513  source venv/bin/activate && pip list | grep face
+  514  source venv/bin/activate && python -c "import face_recognition; print('Success!')"
+  515  source venv/bin/activate && python -c "import face_recognition_models; print(face_recognition_models.__file__)"
+  516  source venv/bin/activate && pip install setuptools
+  517  source venv/bin/activate && python -c "import face_recognition; print('Success!')"
+  518  source venv/bin/activate && python -c "import face_recognition_models; print(face_recognition_models.__file__)"
+  519  source venv/bin/activate && python -c "import setuptools; print(setuptools.__version__)" && python -c "import pkg_resources; print('pkg_resources found')"
+  520  source venv/bin/activate && pip install "setuptools<70"
+  521  source venv/bin/activate && python -c "import pkg_resources; print('pkg_resources found')" && python -c "import face_recognition; print('face_recognition success')"
+  522  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  523  ls -R data
+  524  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+  525  source venv/bin/activate && python test_backend.py
+  526  source venv/bin/activate && python test_backend.py
+  527  cd /home/provet/Repositories/grabthatface
+  528  mkdir -p backend/app/core backend/app/api backend/app/services backend/app/workers backend/app/schemas && touch backend/app/core/__init__.py backend/app/api/__init__.py backend/app/services/__init__.py backend/app/workers/__init__.py backend/app/schemas/__init__.py
+  529  mkdir -p backend/app/api/v1/endpoints && touch backend/app/api/v1/__init__.py backend/app/api/v1/api.py backend/app/api/v1/endpoints/__init__.py
+  530  cd /home/provet/Repositories/grabthatface/backend
+  531  mkdir -p .github/workflows deployment/monitoring && touch .github/workflows/mlops.yml deployment/monitoring/prometheus.yml deployment/docker-compose.yml
+  532  fuser -k 8000/tcp || true
+  533  mkdir -p tests && touch tests/test_model_accuracy.py tests/test_api.py
+  534  source venv/bin/activate && python scripts/benchmark.py
+  535  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+  536  curl http://localhost:8000/health
+  537  uv --version
+  538  uv init --app && uv add fastapi "uvicorn[standard]" sqlmodel "python-multipart" "python-jose[cryptography]" "passlib[bcrypt]" face-recognition numpy opencv-python-headless pillow pytest httpx pydantic-settings loguru prometheus-client mlflow celery redis psycopg2-binary requests setuptools
+  539  uv add faiss-cpu
+  540  source venv/bin/activate && python scripts/benchmark.py
+  541  uv add git+https://github.com/ageitgey/face_recognition_models
+  542  uv add git+https://github.com/ageitgey/face_recognition_models
+  543  uv run python -c "import face_recognition; print('Success')"
+  544  uv pip list | grep face
+  545  source venv/bin/activate && pip install git+https://github.com/ageitgey/face_recognition_models
+  546  uv run python -c "import face_recognition; print('Success')"
+  547  source venv/bin/activate && pytest tests/
+  548  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/
+  549  source venv/bin/activate && pip install faiss-cpu
+  550  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/
+  551  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/
+  552  uv pip list | grep scikit-image
+  553  source venv/bin/activate && python scripts/download_test_data.py
+  554  ping -c 1 google.com
+  555  uv add scikit-learn
+  556  uv add scikit-image
+  557  source venv/bin/activate && python -c "from skimage import data; lfw = data.lfw_subset(); print(lfw.shape)"
+  558  uv run python -c "from skimage import data; lfw = data.lfw_subset(); print(lfw.shape)"
+  559  curl -I https://raw.githubusercontent.com/stefanpeidli/ORL-Faces/master/ORL_Faces.zip
+  560  curl -L -o lfw_subset.zip https://github.com/uog-shun/lfw-subset/archive/refs/heads/master.zip && du -h lfw_subset.zip
+  561  curl -L -o tests/data/yalefaces.zip https://github.com/vsmolyakov/experiments_with_python/raw/master/ch02/yalefaces.zip && du -h tests/data/yalefaces.zip
+  562  unzip -l tests/data/yalefaces.zip | head -n 20
+  563  file tests/data/yalefaces.zip
+  564  curl -I http://vis-www.cs.umass.edu/lfw/index.html
+  565  uv run python -c "from sklearn.datasets import fetch_olivetti_faces; data = fetch_olivetti_faces(); print(data.images.shape)"
+  566  uv run python scripts/prepare_test_faces.py
+  567  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  568  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  569  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  570  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  571  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  572  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  573  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  574  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  575  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  576  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  577  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v -s tests/test_e2e_ml.py
+  578  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py tests/test_api.py tests/test_performance.py tests/test_model_accuracy.py
+  579  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && pytest -v tests/test_e2e_ml.py
+  580  source venv/bin/activate && export PYTHONPATH=$PYTHONPATH:. && uvicorn app.main:app --reload --port 8000
+  581  lsof -i :8000
+  582  ps aux | grep uvicorn
+  583  redis-cli ping
+  584  docker --version
+  585  docker run -d --name redis-server -p 6379:6379 redis
+  586  pytest tests/test_api.py
+  587  pytest tests/test_api.py
+  588  pytest tests/test_scalable.py
+  589  pytest tests/ > test_report.log 2>&1 &
+  590  pytest tests/ && rm test_report.log
+  591  pytest tests/
+  592  pytest tests/
+  593  lsof -i :8000
+  594  ss -tulpn | grep :8000
+  595  curl http://localhost:8000/health
+  596  ss -tulpn | grep :6379
+  597  venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+  598  curl http://localhost:8000/health
+  599  curl -X POST -F "file=@tests/data/faces/olivetti/person_00/1.jpg" -F "event_id=demo-event" http://localhost:8000/api/v1/photos/
+  600  curl -X POST -F "file=@tests/data/faces/olivetti/person_00/image_00.jpg" -F "event_id=demo-event" http://localhost:8000/api/v1/photos/
+  601  sqlite3 production.db "SELECT count(*) FROM faceencoding WHERE photo_id=1;"
+  602  curl -X POST -F "file=@tests/data/faces/olivetti/person_00/image_01.jpg" http://localhost:8000/api/v1/search/
+  603  kill -9 205567 && venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+  604  curl http://localhost:8000/health
+  605  curl -X POST -F "file=@tests/data/faces/olivetti/person_00/image_01.jpg" http://localhost:8000/api/v1/search/
+  606  kill -9 207003 && venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+  607  curl -X POST -F "file=@tests/data/faces/olivetti/person_01/image_00.jpg" -F "event_id=demo-event-2" http://localhost:8000/api/v1/photos/
+  608  sleep 12 && curl -X POST -F "file=@tests/data/faces/olivetti/person_01/image_01.jpg" http://localhost:8000/api/v1/search/
+  609  curl -X POST -F "file=@data/uploads/a386e4e9-408a-44e2-8ec8-91687bbc3e0a_image_00.jpg" http://localhost:8000/api/v1/search/
+  610  curl http://localhost:8000/health && ss -tulpn | grep :6379 && ps aux | grep celery
+  611  pytest tests/test_hardcore_integration.py -s
+  612  cd /home/provet/Repositories/grabthatface
+  613  mkdir mobileapp && cd mobileapp && npx create-expo-app@latest . --yes
+  614  npm install expo-camera expo-linear-gradient lucide-react-native axios expo-image-picker expo-media-library expo-sharing @expo/vector-icons
+  615  echo $ANDROID_HOME && which adb && ls -d ~/Android/Sdk 2>/dev/null || echo "Not found"
+  616  npm start
+  617  mkdir -p backend/app backend/tests frontend
+  618  cmake --version
+  619  pip install -r backend/requirements.txt
+  620  cd /home/provet/Repositories/grabthatface/backend
+  621  python -m venv venv
+  622  source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  623  source venv/bin/activate && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  624  cd /home/provet/Repositories/grabthatface
+  625  npx -y create-next-app@latest frontend --typescript --tailwind --eslint --no-src-dir --import-alias "@/*" --app
+  626  cd /home/provet/Repositories/grabthatface/frontend
+  627  npm install lucide-react react-webcam axios
+  628  npm run dev
+  629  cd /home/provet/Repositories/grabthatface/backend
+  630  uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+  631  cd /home/provet/Repositories/grabthatface/frontend
+  632  npm run dev -- --port 3000
+  633  source venv/bin/activate && pip list
+  634  source venv/bin/activate && pip install "fastapi[all]" "uvicorn[standard]" "sqlmodel" "python-multipart" "python-jose[cryptography]" "passlib[bcrypt]" "face-recognition" "numpy" "opencv-python-headless" "pillow" "pytest" "httpx"
+  635  source venv/bin/activate && python test_backend.py
+  636  source venv/bin/activate && pip install requests
+  637  source venv/bin/activate && python test_backend.py
+  638  fuser -k 8000/tcp || true
+  639  source venv/bin/activate && pip install -r requirements.txt
+  640  kill -9 170914
+  641  source venv/bin/activate && python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+  642  cd frontend
+  643  ls
+  644  git status
+  645  git status
+  646  cd mobileapp
+  647  ls 
+  648  git init
+  649  git status
+  650  git add .
+  651  git commit -m 
+  652  git commit -m "[Antigravity] started working on app"
+  653  git status
+  654  git status
+  655  git add .
+  656  git commit -m "theme edits"
+  657  git status
+  658  git status
+  659  git add . 
+  660  git commit -m "main app focus area"
+  661  git status
+  662  git add . 
+  663  git commit -m "[Antigravity] aded main app layout "
+  664  git status
+  665  git add .
+  666  git commit -m  "mobile app version done"
+  667  npm run android
+  668  clear
+  669  npm run android
+  670  sudo pacman -S android-sdk android-sdk-platform-tools\n
+  671  sudo pacman -S android-sdk android-sdk-platform-tools\n
+  672  sudo pacman -S android-sdk-platform-tools android-sdk-cmdline-tools-latest\nsudo pacman -S android-tools\n
+  673  npm run android
+  674  npm run web
+  675  git status
+  676  git status
+  677  git add .
+  678  git commit -m "added explore tab "
+  679  htop 
+  680  hyprctl reload
+  681  google-chrome-stable
+  682  hyprland 
+  683  start-hyprland
+  684  poweroff
+  685  start-hyprland
+  686  google-chrome-stable
+  687  start-hyprland
+  688  acpi -b
+  689  upoer
+  690  upower
+  691  upower -e
+  692  cat /sys/class/power_supply/BAT0/capacity\n
+  693  upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep percentage\n
+  694  cat /sys/class/power_supply/BAT0/capacity
+  695  watch -n1 cat /sys/class/power_supply/BAT0/capacity\n
+  696  upower -i $(upower -e | grep BAT)\n
+  697  upower -i $(upower -e | grep BAT)\n
+  698  upower -i $(upower -e | grep BAT)\n
+  699  reboot
+  700  google-chrome-stable
+  701  upower -i $(upower -e | grep BAT)\n
+  702  journalctl | grep "81%"
+  703  journalctl
+  704  journalctl | grep "81"
+  705  journalctl | grep "battery"
+  706  systemd.services
+  707  systemctl list-units --type=service --all\n
+  708  systemctl list-unit-files --type=service\n
+  709  upower -i $(upower -e | grep BAT)\n
+  710  htop
+  711  upower -i $(upower -e | grep BAT)\n
+  712  upower -e\n# Then look for the battery device (e.g., /org/freedesktop/UPower/devices/battery_BAT0)\nupower -i /org/freedesktop/UPower/devices/battery_BAT0\n
+  713  upower --monitor-detail\n
+  714  cat /var/lib/upower/history-charge-*.dat\n
+  715  start-hyprland
+  716  google-chrome-stable
+  717  cat /sys/class/power_supply/BAT*/status\n
+  718  cat /sys/class/power_supply/BAT*/power_now\n
+  719  sudo pacman -S tlp tlp-rdw\nsudo systemctl enable tlp --now\n
+  720  sudo systemctl enable tlp --now\n
+  721  sudo systemctl enable tlp 
+  722  sudo iw dev wlan0 set power_save on\n
+  723  sudo powertop --time=10\n
+  724  lspci | grep -E "VGA|3D"\n
+  725  cat /proc/acpi/bbswitch\n
+  726  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor\n
+  727  sudo pacman -S powertop\nsudo powertop\n
+  728  sudo powertop --auto-tune\n
+  729  sudo pacman -S nvidia nvidia-utils\n
+  730  sudo systemctl enable nvidia-persistenced.service --now\n
+  731  sudo nano /etc/modprobe.d/nvidia-pm.conf\n
+  732  sudo nano /etc/modprobe.d/nvidia-pm.conf\n
+  733  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  734  nvidia-smi\n
+  735  sudo systemctl enable tlp --now
+  736  cat /sys/class/power_supply/BAT*/power_now\n
+  737  reboot
+  738  powertop\n
+  739  sudo powertop
+  740  start-hyprland
+  741  google-chrome-stable
+  742  cat /sys/class/power_supply/BAT*/power_now\n
+  743  nvidia-smi\n
+  744  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  745  htop
+  746  sudo pacman -S tlp powertop thermald\n
+  747  nvidia-smi\n
+  748  sudo pacman -S nvidia-prime\n
+  749  sudo systemctl enable nvidia-powerd --now\n
+  750  cat /proc/acpi/bbswitch\n
+  751  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  752  glxinfo | grep "OpenGL renderer"\n
+  753  prime-run glxinfo | grep "OpenGL renderer"\n
+  754  cat /sys/bus/pci/devices/0000:01:00.0/power/control\n
+  755  lsof /dev/nvidia*\n
+  756  sudo nano /etc/modprobe.d/nvidia.conf\n
+  757  sudo pacman -S mesa-utils lsof\n
+  758  sudo mkinitcpio -P\n
+  759  reboot
+  760  start-hyprland
+  761  echo auto | sudo tee /sys/bus/pci/devices/0000:01:00.0/power/control\n
+  762  cat /sys/bus/pci/devices/0000:01:00.0/power/control\n
+  763  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  764  glxinfo | grep "OpenGL renderer"\n
+  765  prime-run glxinfo | grep "OpenGL renderer"\n
+  766  lsof /dev/nvidia*\n
+  767  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  768  systemctl status nvidia-powerd\n
+  769  5;9usudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  770  sudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  771  nano ~/.config/hypr/hyprland.conf\n
+  772  sudo mkinitcpio -P\nreboot\n
+  773  google-chrome-stable
+  774  start-hyprland
+  775  google-chrome-stable
+  776  lsof /dev/nvidia*\n
+  777  nvidia-smi
+  778  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  779  nano ~/.config/hypr/hyprland.conf\n
+  780  sudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  781  lsof /dev/nvidia*\n
+  782  cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status\n
+  783  sudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  784  sudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  785  sudo nano /etc/modprobe.d/nvidia-drm.conf\n
+  786  sudo pacman -S xorg-server xorg-xinit xorg-xrandr\n
+  787  sudo pacman -S nvidia-prime\n
+  788  prime-run glxinfo | grep "OpenGL renderer"\n
+  789  prime-run glxgears\n
+  790  lsof /dev/nvidia*\n
+  791  nvidia-smi
+  792  sudo envycontrol -s hybrid\nreboot\n
+  793  nvidia-smi\n
+  794  sudo nvidia-smi -pm 0\n
+  795  sudo nvidia-smi -lgc 210,210\n
+  796  hyprctl monitors\n
+  797  sudo pacman -S tlp powertop\n
+  798  sudo systemctl enable tlp --now\n
+  799  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor\n
+  800  iw dev
+  801  powertop\n
+  802  sudo su
+  803  systemctl --user list-units --state=running
+  804  systemctl --user mask at-spi-dbus-bus.service\nsystemctl --user mask dbus-:1.18-org.a11y.atspi.Registry@0.service\n
+  805  systemctl --user disable gvfs-daemon.service\nsystemctl --user stop gvfs-daemon.service\n
+  806  nvidia-smi
+  807  dir ~/.config
+  808  sudo useradd -m -G wheel grizzner\n
+  809  sudo passwd grizzner
+  810  htop
+  811  nvidia-smi
+  812  logoin
+  813  login
+  814  ls
+  815  cd Downloads
+  816  git clone https://github.com/gh0stzk/dotfiles.git
+  817  ls -la
+  818  cd dotfiles
+  819  grep -E "sudo|/etc/|/boot/|systemctl enable" install.sh\n
+  820  ls
+  821  grep -E "sudo|/etc/|/boot/|systemctl enable" RiceInstaller\n
+  822  sed -n '1,200p' RiceInstaller
+  823  grep -E "sudo|/etc/|/boot/|systemctl enable" RiceInstaller\n
+  824  code
+  825  cp RiceInstaller RiceInstaller.bak\n
+  826  wc -l RiceInstaller
+  827  cat RiceInstaller
+  828  cat > Rice.safe
+  829  nano Rice.safe
+  830  google-chrome-stable
+  831  nvidia-smi
+  832  start-hyprland 
+  833  reboot
+  834  ls
+  835  ls -la
+  836  cd ..
+  837  ls
+  838  cp -r /home/provet/Downloads/dotfiles/ /home/grizzner
+  839  sudo su
+  840  sudo cp -r /home/provet/Downloads/dotfiles/ /home/grizzner
+  841  exit
+  842  ls -la
+  843  cd ..
+  844  ls
+  845  cd grizzner
+  846  sudo su
+  847  exit
+  848  # As root or a user with sudo privileges\nsudo usermod -aG sudo grizzner
+  849  sudo visudo
+  850  google-chrome-stable
+  851  hyprland
+  852  exit
+  853  pacman -S sudo
+  854  sudo pacman -S sudo
+  855  usermod -aG wheel grizzner
+  856  sudo usermod -aG wheel grizzner
+  857  google-chrome-stable
+  858  sudo pkill -KILL -u grizzner
+  859  hyprland 
+  860  clear
+  861  exit
+  862  goog
+  863  google-chrome-stable
+  864  hyprland
+  865  exit
+  866  poweroff
+  867  hyprland
+  868  visudo
+  869  sudo visudo
+  870  vi
+  871  vim
+  872  su -
+  873  google-chrome-stable
+  874  nvidia-smi
+  875  pacman -Qi sudo 
+  876  sudo usermod -aG wheel grizzner
+  877  sudo visudo
+  878  sudo EDITOR=nano visudo\n
+  879  exit
+  880  hyprland
+  881  su - provet
+  882  reboot
+  883  google-chrome-stable
+  884  google-chrome-stable
+  885  exit
+  886  start-hyprland
+  887  exit
+  888  rebot
+  889  reboot
+  890  sudo pkill -KILL -u grizzner
+  891  reboot
+  892  gemini
+  893  sudo sed -i 's/Current=.*/Current=sddm-sugar-candy/' /etc/sddm.conf.d/kde_settings.conf
+  894  sudo sed -i 's/Current=.*/Current=sddm-sugar-candy/' /etc/sddm.conf.d/the_hyde_project.conf
+  895  reboot
+  896  start-hyprland
+  897  gemini
+  898  reboot
+  899  google-chrome-stable
+  900  git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+  901  google-chrome-stable
+  902  reboot
+  903  nvidia-smi
+  904  nano ~/.config/hypr/hyprland.conf
+  905  nano ~/.config/hypr/hyprland.conf
+  906  hyprlauncher
+  907  sudo pacman -S hyprlauncher
+  908  google-chrome-stable
+  909  tlp --now
+  910  power-profiles-daemon
+  911  battery
+  912  ambxst
+  913  grim 
+  914  slurp
+  915  nvidia-smi
+  916  autocpufreq-stats
+  917  sudo pacman -S autocpufreq
+  918  sudo pacman -S autocpufreq-stats
+  919  sudo pacman -S auto-cpufreq
+  920  auto-cpufreq-stats
+  921  auto-cpufreq --stats
+  922  sudo auto-cpufreq --install
+  923  auto-cpufreq --stats
+  924  auto-cpufreq --go
+  925  auto-cpufreq 
+  926  suprgfxctl
+  927  sudo pacman -S suprgfxctl
+  928  yay -S suprgfxctl
+  929  yay -S supergfxctl
+  930  supergfxctl -s
+  931   systemctl enable supergfxd
+  932  supergfxctl -s
+  933  supergfxctl -S
+  934  supergfxctl --status
+  935  supergfxctl -g
+  936  sudo systemctl enable supergfxd
+  937  sudo systemctl start supergfxd.service
+  938  supergfxctl -g
+  939  supergfxctl -S
+  940  supergfxctl -s
+  941  supergfxctl -m Integrated
+  942  logout
+  943  exit
+  944  reboot
+  945  waybar
+  946  waybar
+  947  nvidia-smi
+  948  supergfxctl -s
+  949  supergfxctl -g
+  950  supergfxctl -help
+  951  supergfxctl --help
+  952  supergfxctl -m
+  953  supergfxctl -m Integrated
+  954  supergfxctl -g
+  955  supergfxctl -m Integrated
+  956  logout
+  957  exit
+  958  supergfxctl -g
+  959  supergfxctl -m Integrated
+  960  pkill -u provet
+  961  sddm
+  962  logout
+  963  supergfxctl -g
+  964  supergfxctl -m Integrated
+  965  logout
+  966  supergfxctl -g
+  967  supergfxctl -h
+  968  supergfxctl -s
+  969  supergfxctl -v
+  970  supergfxctl -S
+  971  supergfxctl -g
+  972  supergfxctl -P
+  973  supergfxctl -m Integrated
+  974  supergfxctl -P
+  975  start-hyprland
+  976  systemctl status supergfxd
+  977  sudo supergfxctl -m Integrated
+  978  prime-run
+  979  prime-run
+  980  prime
+  981  nvidia prime-
+  982  prime-run -help
+  983  nvidia-settings
+  984  sudo supergfxctl -m Integrated
+  985  yay -S optimus-manager\n
+  986  optimus-manager
+  987  yay -S optimus-manager\n
+  988  optimus-manager --help
+  989  optimus-manager --status
+  990  optimus-manager --switch amd
+  991  optimus-manager --switch integrated
+  992  sudo systemctl enable --now optmius-manager
+  993  sudo systemctl enable --now optimus-manager
+  994  sudo systemctl start optmius-manager
+  995  sudo systemctl start optimus-manager
+  996  optimus-manager --switch integrated
+  997  optimus-manager --status
+  998  nano /var/log/optimus-manager/switch/switch-20260210T172310.log
+  999  cat /var/log/optimus-manager/switch/switch-20260210T172310.log
+ 1000  reboot
+ 1001  optimus-manager --switch integrated
+ 1002  nvidia-smi
+ 1003  optimus-manager --switch integrated
+ 1004  sudo pacman -S procps-ng\n
+ 1005  optimus-manager --status
+ 1006  reboot 
+ 1007  optimus-manager --status
+ 1008  optimus-manager --switch integrated
+ 1009  optimus-manager --switch integrated
+ 1010  optimus-manager --status
+ 1011  pkill Xorg 
+ 1012  sudo pkill Xorg
+ 1013  optimus-manager --status
+ 1014  optimus-manager --switch integrated
+ 1015  reboot
+ 1016  optimus-manager --status
+ 1017  optimus-manager --switch integrated
+ 1018  optimus-manager --status
+ 1019  reboot
+ 1020  optimus-manager --status
+ 1021  nvidia-prime google-chrome-stable
+ 1022  prime-run
+ 1023  prime-run google-chrome-stable
+ 1024  prime-run google-chrome-stable
+ 1025  prime-run firefox
+ 1026  htop
+ 1027  prime-run firefox
+ 1028  prime-run firefox
+ 1029  prime-run firefox
+ 1030  logout
+ 1031  reboot
+ 1032  start-hyprland
+ 1033  sudo systemctl disable sddm.service
+ 1034  sudo systemctl enable sddm.service
+ 1035  sudo systemctl start sddm.service
+ 1036  reboot
+ 1037  reboot
+ 1038  sudo nano /usr/share/sddm/scripts/Xsetup
+ 1039  sudo nano /usr/share/sddm/scripts/wayland-session
+ 1040  sudo nano /usr/share/sddm/scripts/Xsession
+ 1041  sudo systemctl enable sddm.service
+ 1042  sudo systemctl start sddm.service
+ 1043  sudo systemctl disable sddm.service
+ 1044  start-hyprland
+ 1045  sudo nano /usr/share/sddm/scripts/Xsetup
+ 1046  sudo systemctl start sddm.service
+ 1047  sudo nano /usr/share/sddm/scripts/Xsession
+ 1048  start-hyprland
+ 1049  reboot
+ 1050  sudo nano /usr/share/sddm/scripts/Xsession
+ 1051  sudo nano /usr/share/sddm/scripts/Xsetup
+ 1052  reboot
+ 1053  reboot
+ 1054  poweroff
+ 1055  sudo systemctl disable sddm.serice
+ 1056  sudo systemctl disable sddm.serice
+ 1057  sudo systemctl disable sddm.service
+ 1058  clear
+ 1059  waybar
+ 1060  waybar
+ 1061  waypaper
+ 1062  waypaper 
+ 1063  killall waybar
+ 1064  waybar
+ 1065  waybar & 
+ 1066  waybar
+ 1067  waybar
+ 1068  waybar
+ 1069  waybar
+ 1070  waybar
+ 1071  waybar
+ 1072  waybar
+ 1073  cat ~/.config/waybar/includes/global.css
+ 1074  cat > ~/.config/waybar/includes/global.css
+ 1075  waybar
+ 1076  rm -rf ~/.config/waybar/
+ 1077  waybar
+ 1078  dir ~/.config/waybar/
+ 1079  dir ~/.config/
+ 1080  sudo pacman -S waybar
+ 1081  dir ~/.config/waypaper
+ 1082  dir ~/.config/waybar
+ 1083  waybar
+ 1084  sudo pacman -Rns waybar
+ 1085  sudo pacman -S waybar
+ 1086  dir ~/.config/
+ 1087  dir ~/.config/waybar
+ 1088  waybar
+ 1089  pkill waybar
+ 1090  waybar &
+ 1091  dir ~/.config/waypaper/mkdir -p ~/.config/waybar\ncp /usr/share/waybar/config ~/.config/waybar/\ncp /usr/share/waybar/style.css ~/.config/waybar/\n
+ 1092  pkill waybar\nwaybar &\n
+ 1093  killall waybar
+ 1094  dir ~/.config/waybar
+ 1095  mkdir ~/.config/waybar
+ 1096  pkill waybar\nwaybar &\n
+ 1097  killall waybar
+ 1098  dir ~/.config/waybar
+ 1099  mkdir ~/.config/waybar/includes
+ 1100  cat > ~/.config/waybar/includes/global.css
+ 1101  pkill waybar\nwaybar &\n
+ 1102  mkdir -p ~/.config/waybar\ncp /etc/xdg/waybar/config ~/.config/waybar/config\ncp /etc/xdg/waybar/style.css ~/.config/waybar/style.css\n
+ 1103  pkill waybar && waybar &\n
+ 1104  killall waybar
+ 1105  sudo pacman -S waybar
+ 1106  dir ~/.config/waybar/includes
+ 1107  yay -S waybar
+ 1108  dir ~/.config/way
+ 1109  waybar
+ 1110  waybar &
+ 1111  waybar &
+ 1112  cd BACKUP-pre-hyde
+ 1113  ls
+ 1114  cd .config
+ 1115  ls
+ 1116  cp ~/.config/hypr/hyprland.conf .
+ 1117  git status
+ 1118  git add hyprland.conf
+ 1119  git status
+ 1120  cd Thunar
+ 1121  ls
+ 1122  cd ..
+ 1123  git status
+ 1124  git diff
+ 1125  git diff hyprland.conf
+ 1126  git diff
+ 1127  git commit -m "changed binds and added menu"
+ 1128  git diff
+ 1129  git add Thunar/
+ 1130  git commit -m "added thunar default configuration"
+ 1131  ls -la
+ 1132  ls 
+ 1133  mv hyprland.conf hypr/
+ 1134  ls
+ 1135  git status
+ 1136  git add .
+ 1137  git commit -m "forgot to move hyprland.conf to right folder"
+ 1138  igt status
+ 1139  git status
+ 1140  git status
+ 1141  git log --oneline
+ 1142  git revert 8cf26c6
+ 1143  sudo pacman -S vi
+ 1144  git revert 8cf26c6
+ 1145  git status
+ 1146  git stash
+ 1147  git status
+ 1148  git revert 8cf26c6
+ 1149  git status
+ 1150  git status
+ 1151  git log --oneline
+ 1152  git status
+ 1153  git status
+ 1154  git status
+ 1155  git status
+ 1156  git status
+ 1157  git log --oneline
+ 1158  git ls-files
+ 1159  nano waybar/includes/global.css
+ 1160  cat waybar/includes/global.css
+ 1161  sudo pacman -S wofi
+ 1162  nano ~/.config/hypr/hyprland.conf
+ 1163  nano ~/.config/hypr/hyprland.conf
+ 1164  nano ~/.config/hypr/hyprland.conf
+ 1165  dir ~/.config/wofi/
+ 1166  wofi --show drun
+ 1167  mkdir ~/.config/wofi/
+ 1168  cat > ~/.config/wofi/config
+ 1169  cat > ~/.config/wofi/style.css
+ 1170  wofi --show drun
+ 1171  sudo pacman -S rofi
+ 1172  dir ~/.config/rofi
+ 1173  mkdir ~/.config/rofi
+ 1174  cat > ~/.config/rofi/theme.rasi
+ 1175  rofi
+ 1176  rofi -ishow drun
+ 1177  rofi -show drun
+ 1178  dir ~/.config/waybar
+ 1179  gemini
+ 1180  waybar
+ 1181  nvidia-smi
+ 1182  gemin
+ 1183  gemini
+ 1184  gemini
+ 1185  ambxst
+ 1186  ls
+ 1187  thunar
+ 1188  ambxst
+ 1189  cd Repositories
+ 1190  ls
+ 1191  cd grabthatface
+ 1192  ls 
+ 1193  cd agents
+ 1194  ls
+ 1195  cd ..
+ 1196  cd backend
+ 1197  git status
+ 1198  git log --oneline
+ 1199  git remote add origin https://github.com/RedLordezh7Venom/grabthatface.git
+ 1200  git checkout -b "backend"
+ 1201  git status
+ 1202  git push
+ 1203  git status
+ 1204  git ls-lf
+ 1205  git ls-files
+ 1206  cd ..
+ 1207  du -sh backend
+ 1208  cd backend
+ 1209  ls
+ 1210  du -sh venv
+ 1211  du -sh .venv
+ 1212  nano .git
+ 1213  nano .gitignore
+ 1214  git ls-files
+ 1215  git status
+ 1216  git add .
+ 1217  git commit -m "edited .gitignore"
+ 1218  git push
+ 1219  git push --set-upstream origin backend
+ 1220  cd ..
+ 1221  cd frontend
+ 1222  ls -la
+ 1223  git status
+ 1224  git remote add origin https://github.com/RedLordezh7Venom/grabthatface.git
+ 1225  git checkout -b "frontend"
+ 1226  git status
+ 1227  git push --set-upstream origin frontend
+ 1228  grim 
+ 1229  slurp
+ 1230  hyprctl reload
+ 1231  grim
+ 1232  ls 
+ 1233  cat > newupdates.txt
+ 1234  cat >otherupdates.txt
+ 1235  cd Repositories
+ 1236  antigravity . 
+ 1237  cd grabthatface
+ 1238  antigravity .
+ 1239  git status
+ 1240  ls 
+ 1241  cd ..
+ 1242  cd backend
+ 1243  ls
+ 1244  git fetch
+ 1245  git pull
+ 1246  git log --oneline
+ 1247  git log --oneline
+ 1248  git status
+ 1249  git status
+ 1250  git branch
+ 1251  git push --set-upstream origin main
+ 1252  git push --set-upstream origin backend
+ 1253  git pull
+ 1254  git status
+ 1255  git pull 
+ 1256  git status
+ 1257  git status
+ 1258  git push --set-upstream origin backend
+ 1259  git branch
+ 1260  git pull 
+ 1261  git pull --ff
+ 1262  git status
+ 1263  git log --oneline
+ 1264  git push --set-upstream origin backend
+ 1265  git log --oneline
+ 1266  GIT STATUS
+ 1267  git status
+ 1268  git push
+ 1269  git push --set-upstream origin backend
+ 1270  git pull --f
+ 1271  git pull --ff
+ 1272  git pull
+ 1273  git pull --f
+ 1274  git pull --ff
+ 1275  git status
+ 1276  git push --force --set-upstream origin backend
+ 1277  cd /home/provet/Repositories/grabthatface/backend
+ 1278  git show --stat da64a0e 234106d 5726ac8 0dc4204 67c32be
+ 1279  git show --name-only da64a0e 234106d 5726ac8 0dc4204 67c32be
+ 1280  git log -n 15 --oneline
+ 1281  git show --name-only 67c32be 0dc4204 5726ac8 234106d da64a0e e4bbc70 9108d01 87149dc 192735c 5c90d03 a4e0754 22835b7 bc22d51 8a4311c 081e39a
+ 1282  for hash in $(git log -n 20 --format="%h"); do\n  files=$(git show --name-only --format="" $hash | xargs echo)\n  if [ -n "$files" ]; then\n    echo "$hash: $files"\n  fi\ndone
+ 1283  for hash in $(git log -n 5 --format="%h"); do\n  files=$(git show --name-only --format="" $hash | xargs echo)\n  if [ -n "$files" ]; then\n    echo "$hash: $files"\n  fi\ndone
+ 1284  git log -n 25 --oneline
+ 1285  git show --name-only 5e62149 e4bbc70
+ 1286  git log --oneline e6cebf1..67c32be --reverse
+ 1287  git config user.name && git config user.email
+ 1288  chmod +x rewrite_history.sh && ./rewrite_history.sh
+ 1289  git log -n 10 --oneline
+ 1290  git log -n 1 --format="%an <%ae>"
+ 1291  rm rewrite_history.sh
+ 1292  git log --grep="auto-commit" --oneline --all
+ 1293  git log -n 100 --grep="auto-commit" --oneline
+ 1294  git log -n 50 --format="%h %an <%ae> %s"
+ 1295  git log --author="emergent-agent-e1" --oneline --all
+ 1296  git log -n 100 --format="%h %an <%ae> %s"
+ 1297  git log --format="%h" --reverse --all | xargs echo
+ 1298  git show -s 0ec0acb
+ 1299  git log --format="%h %s" --reverse backend
+ 1300  git log --format="%h %s" --reverse backend > full_history.txt && cat full_history.txt
+ 1301  git show --name-only 0ec0acb
+ 1302  for hash in ba6d7df 54d04ae 148c83a 4974597 238e370 3d0bdec a3f0162 66cb5e4 72f85f7 6742f3c 998dccb b6f89a1 453d58a 3154f85 4b5addd b67612a 2c70058 eab3c39 e6cebf1 dc8323b c34ae90 041519f 51de299 8dcfc82 bd86054 ffca641 7d39b8a 302eb47 f228d62 07fefac f4185e7 0fa70a7 49a64e6 a4890bd 1525178 233ead8 ed56eca 767accf 1106fae 0d202b6; do\n  git log -1 --format="%T" $hash\ndone
+ 1303  git log --format="%h %an %s" 0ec0acb..backend
+ 1304  chmod +x rebuild_linear_history.sh && ./rebuild_linear_history.sh && git checkout backend && git reset --hard backend
+ 1305  git log -n 1 78fb0b310ef7c4f2f4d8ff6a81067444e29f6e67 --oneline
+ 1306  git reset --hard 78fb0b310ef7c4f2f4d8ff6a81067444e29f6e67
+ 1307  git log -n 50 --oneline --format="%h %an <%ae> %s"
+ 1308  rm rebuild_linear_history.sh full_history.txt
+ 1309  nvidia-smi
+ 1310  history 0
+ 1311  htop
+ 1312  ls -la
+ 1313  cd Repositories
+ 1314  cd ..
+ 1315  cd  Repositories
+ 1316  cd grabthatface
+ 1317  cd backend
+ 1318  history 0 > myzshistory.txt
+ 1319  git status
+ 1320  git add .
+ 1321  git rm --cached
+ 1322  git status
+ 1323  git rm --cached .
+ 1324  git status
+ 1325  git rm -r --cached .
+ 1326  git status
+ 1327  ls -la
+ 1328  cd tests
+ 1329  ls
+ 1330  cd data
+ 1331  ls
+ 1332  cd faces
+ 1333  ls
+ 1334  cd olivetti
+ 1335  ls
+ 1336  git status
+ 1337  ls
+ 1338  cd ..
+ 1339  cd ..
+ 1340  cd ..
+ 1341  ls
+ 1342  cd ..
+ 1343  cd ..
+ 1344  ls
+ 1345  cd backend
+ 1346  ls
+ 1347  git status
+ 1348  git stash
+ 1349  git status
+ 1350  rm myzshistory.txt
+ 1351  git status
+ 1352  history 0 | grep "passwd"
+ 1353  history 0 | grep "token"
+ 1354  history 0 | grep "key"
+ 1355  history 0 | grep "snoop"
+ 1356  history 0 | grep "school"
+ 1357  history 0 | grep "prabhat"
