@@ -12,6 +12,8 @@ from sqlmodel import Session, select
 import numpy as np
 import json
 import mlflow
+import threading
+import time
 
 # Initialize Infrastructure
 setup_logging()
@@ -22,15 +24,19 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-def hydrate_index():
-    """Populate FAISS index from the database on startup."""
-    with Session(engine) as session:
-        records = session.exec(select(FaceEncoding)).all()
-        logger.info(f"Hydrating FAISS index with {len(records)} faces...")
-        for r in records:
-            encoding = np.array(json.loads(r.encoding_json))
-            processor.add_to_index(r.id, encoding)
-        logger.info("FAISS index hydration complete.")
+def start_index_sync():
+    """Background thread to keep index synced with DB."""
+    def sync_loop():
+        while True:
+            try:
+                processor.sync_with_db(engine)
+            except Exception as e:
+                logger.error(f"Index sync failed: {e}")
+            time.sleep(10) # Sync every 10 seconds
+            
+    thread = threading.Thread(target=sync_loop, daemon=True)
+    thread.start()
+    logger.info("Started periodic FAISS index synchronization thread")
 
 # 1. Metrics Endpoint (for Prometheus)
 metrics_app = make_asgi_app()
@@ -48,7 +54,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
-    hydrate_index()
+    start_index_sync()
 
 @app.get("/health")
 def health_check():
