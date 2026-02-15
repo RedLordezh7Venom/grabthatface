@@ -19,7 +19,6 @@ from prometheus_client import make_asgi_app
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-# Global shutdown event
 shutdown_event = False
 
 def signal_handler(signum, frame):
@@ -75,25 +74,21 @@ async def lifespan(app: FastAPI):
     logger.info("🛑 Shutting down GrabThatFace Production Server")
     logger.info("=" * 60)
     
-    # Close database connections
+    # close db conns
     await close_db()
     
     logger.info("✓ Graceful shutdown complete")
 
-# Create FastAPI app
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan
 )
 
-# Add rate limiter state
-app.state.limiter = limiter
+app.state.limiter = limiter #rate limiter state
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) #exception handler
 
-# Exception handler for rate limiting
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-# CORS Middleware
+# CORS 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
@@ -105,22 +100,19 @@ app.add_middleware(
 # Metrics Middleware (Prometheus)
 app.add_middleware(MetricsMiddleware)
 
-# Mount Prometheus metrics endpoint
+# imp : Mount Prometheus metrics endpoint
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-# Mount static files
+# static files
 app.mount("/static", StaticFiles(directory=settings.STORAGE_PATH), name="static")
 
-# Include API router
+# include router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 # Health check endpoints
 @app.get("/health")
 async def health_check():
-    """
-    Basic health check endpoint.
-    """
     return {
         "status": "healthy",
         "version": "2.0.0",
