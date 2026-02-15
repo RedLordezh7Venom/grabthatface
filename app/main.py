@@ -42,13 +42,11 @@ def start_index_sync():
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-# 2. Middlewares
 app.add_middleware(MetricsMiddleware)
 
 # 3. Static Files (S3 Proxy in prod)
 app.mount("/static", StaticFiles(directory=settings.STORAGE_PATH), name="static")
 
-# 4. Router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.on_event("startup")
@@ -58,5 +56,4 @@ def on_startup():
 
 @app.get("/health")
 def health_check():
-    # Production health check: check DB, check ML model availability
     return {"status": "healthy", "version": "1.0.0"}
