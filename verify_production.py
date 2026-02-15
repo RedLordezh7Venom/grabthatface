@@ -127,6 +127,7 @@ async def test_insightface_model():
         print_test("InsightFace Model Loaded", False, str(e))
         return False
 
+</html>
 async def test_face_detection():
     """Test face detection on sample image."""
     print(f"\n{YELLOW}Testing Face Detection...{RESET}")

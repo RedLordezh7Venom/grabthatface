@@ -13,7 +13,7 @@ class DataValidator:
         self.max_size_mb = max_size_mb
 
     def validate_image(self, file_path: str) -> bool:
-        # 1. Check existence
+        # 1. check exists
         if not os.path.exists(file_path):
             logger.error(f"Validation failed: {file_path} does not exist")
             return False

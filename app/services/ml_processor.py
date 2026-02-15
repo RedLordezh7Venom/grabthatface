@@ -10,12 +10,11 @@ from loguru import logger
 
 class VisionRAGProcessor:
     """
-    Production-grade Vision RAG Processor.
-    Uses FAISS (HNSW) for $O(log N)$ vector search.
+    Production-grade Vision RAG
+    Uses FAISS (HNSW) for O(logN) vector search.
     """
     def __init__(self):
         self.dimension = settings.VECTOR_DIMENSION
-        # HNSW is many times faster than exhaustive search for large datasets
         self.index = faiss.IndexHNSWFlat(self.dimension, 32) # 32 is the number of neighbors
         self.metadata_map = {} # Maps index ID to internal database ID
         self._lock = threading.Lock() # For thread-safety within a process
